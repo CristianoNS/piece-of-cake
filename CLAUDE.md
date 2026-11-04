@@ -37,7 +37,7 @@ Only the owner can judge the look of the UI: ask for a screenshot when a visual 
 - `tests/PieceOfCake.Tests/` xUnit tests. Internals are visible to the test project.
 - `PieceOfCake.sln`, `.editorconfig`, `Directory.Build.props`, `global.json` shared build settings.
   `.github/dependabot.yml` weekly updates.
-- `build.bat` publishes one self-contained `PieceOfCake.exe` (single file, .NET 10 runtime included) to `publish/`, `deploy.bat` installs it. `installer/PieceOfCake.iss` Inno Setup script
+- `build.bat` publishes one self-contained `PieceOfCake.exe` (single file, .NET 10 runtime included, deliberately not compressed: compression costs about 76 MB of RAM) to `publish/`, `deploy.bat` installs it. `installer/PieceOfCake.iss` Inno Setup script
   (needs the `publish` folder). Rebuild it only for a new full release.
 
 ## Release

@@ -7,7 +7,7 @@ własne skrypty, „Paszport komputera" i przełącznik autostartu.
 
 ## Uruchomienie
 
-- Gotowy plik `publish\PieceOfCake.exe` (jeden samodzielny plik z wbudowanym .NET, ok. 66 MB, nie wymaga
+- Gotowy plik `publish\PieceOfCake.exe` (jeden samodzielny plik z wbudowanym .NET, ok. 148 MB na dysku, nie wymaga
   instalowania .NET). Uruchom go, a w zasobniku pojawi się ikona. Kliknięcie ikony otwiera i zamyka panel,
   `Esc` także go zamyka.
 - Z kodu: zainstaluj .NET 10 SDK i uruchom `build.bat` (wynik w folderze `publish`). Testy: `dotnet test PieceOfCake.sln`.
