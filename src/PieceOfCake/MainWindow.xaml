@@ -20,36 +20,6 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16">
 
-                <!-- Głośność -->
-                <Grid Margin="0,0,0,16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="44"/>
-                    </Grid.ColumnDefinitions>
-                    <Button x:Name="MuteButton" Style="{StaticResource IconButton}"
-                            Content="&#xE767;" ToolTip="Wycisz / włącz dźwięk" Click="MuteButton_Click"/>
-                    <Slider x:Name="VolumeSlider" Grid.Column="1" Style="{StaticResource FlatSlider}"
-                            Minimum="0" Maximum="100" Margin="8,0" VerticalAlignment="Center"
-                            ValueChanged="VolumeSlider_ValueChanged"/>
-                    <TextBlock x:Name="VolumeText" Grid.Column="2" Text="0%" HorizontalAlignment="Right"
-                               VerticalAlignment="Center" Foreground="{StaticResource SubTextBrush}"/>
-                </Grid>
-
-                <!-- Plan zasilania -->
-                <TextBlock Text="Plan zasilania" Style="{StaticResource SectionHeader}"/>
-                <UniformGrid Columns="3" Margin="0,0,0,16">
-                    <ToggleButton x:Name="PowerSaverButton" Style="{StaticResource ChipToggle}"
-                                  Content="Oszczędny" Tag="a1841308-3541-4fab-bc81-f71556f20b4a"
-                                  Click="PowerPlan_Click"/>
-                    <ToggleButton x:Name="PowerBalancedButton" Style="{StaticResource ChipToggle}"
-                                  Content="Zrównoważony" Tag="381b4222-f694-41f0-9685-ff5bb260df2e"
-                                  Click="PowerPlan_Click"/>
-                    <ToggleButton x:Name="PowerHighButton" Style="{StaticResource ChipToggle}"
-                                  Content="Wydajny" Tag="8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"
-                                  Margin="0" Click="PowerPlan_Click"/>
-                </UniformGrid>
-
                 <!-- Procesor i pamięć -->
                 <TextBlock Text="System" Style="{StaticResource SectionHeader}"/>
                 <Grid Margin="0,0,0,4">

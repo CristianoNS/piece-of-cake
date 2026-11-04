@@ -17,17 +17,13 @@ namespace PieceOfCake;
 public partial class MainWindow : Window
 {
     private const double ScreenMargin = 12;
-    private const string VolumeGlyph = "";
-    private const string MutedGlyph = "";
 
     private readonly SettingsStore _settings;
-    private readonly VolumeService _volume = new();
     private readonly CpuMeter _cpu = new();
     private readonly DispatcherTimer _metricsTimer;
     private readonly DispatcherTimer _statusTimer;
 
     private DateTime _lastHiddenUtc = DateTime.MinValue;
-    private bool _updatingVolume;
 
     public MainWindow(SettingsStore settings)
     {
@@ -41,7 +37,7 @@ public partial class MainWindow : Window
         HueRoomsControl.ItemsSource = _rooms;
 
         _metricsTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _metricsTimer.Tick += (_, _) => OnMetricsTick();
+        _metricsTimer.Tick += (_, _) => UpdateMetrics();
 
         _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
         _statusTimer.Tick += (_, _) =>
@@ -60,7 +56,6 @@ public partial class MainWindow : Window
 
         Closed += (_, _) =>
         {
-            _volume.Dispose();
             _pairCts?.Cancel();
             _hue?.Dispose();
         };
@@ -140,9 +135,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            RefreshVolume();
             UpdateMetrics();
-            await RefreshPowerPlanAsync();
             await RefreshHueAsync();
         }
         catch (Exception ex)
@@ -159,67 +152,7 @@ public partial class MainWindow : Window
         }
     }
 
-    // ---------- Volume ----------
-
-    private void RefreshVolume()
-    {
-        if (!_volume.TryGet(out var volume, out var muted))
-        {
-            VolumeSlider.IsEnabled = false;
-            MuteButton.IsEnabled = false;
-            return;
-        }
-
-        VolumeSlider.IsEnabled = true;
-        MuteButton.IsEnabled = true;
-
-        _updatingVolume = true;
-        try
-        {
-            VolumeSlider.Value = volume * 100.0;
-        }
-        finally
-        {
-            _updatingVolume = false;
-        }
-
-        VolumeText.Text = $"{Math.Round(volume * 100.0):0}%";
-        MuteButton.Content = muted ? MutedGlyph : VolumeGlyph;
-    }
-
-    private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!IsInitialized || _updatingVolume)
-        {
-            return;
-        }
-
-        _volume.SetVolume(e.NewValue / 100.0);
-        VolumeText.Text = $"{Math.Round(e.NewValue):0}%";
-    }
-
-    private void MuteButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_volume.TryGet(out _, out var muted))
-        {
-            _volume.SetMuted(!muted);
-        }
-
-        RefreshVolume();
-    }
-
     // ---------- CPU / RAM ----------
-
-    private void OnMetricsTick()
-    {
-        UpdateMetrics();
-
-        // Pick up volume changes made elsewhere, but never fight the user's drag.
-        if (!VolumeSlider.IsMouseCaptureWithin)
-        {
-            RefreshVolume();
-        }
-    }
 
     private void UpdateMetrics()
     {
@@ -233,32 +166,6 @@ public partial class MainWindow : Window
             RamBar.Value = used / total * 100.0;
             RamText.Text = $"{used / gigabyte:0.0} / {total / gigabyte:0.0} GB";
         }
-    }
-
-    // ---------- Power plan ----------
-
-    private async Task RefreshPowerPlanAsync()
-    {
-        var active = await Task.Run(PowerPlanService.GetActive);
-        PowerSaverButton.IsChecked = active == PowerPlanService.PowerSaver;
-        PowerBalancedButton.IsChecked = active == PowerPlanService.Balanced;
-        PowerHighButton.IsChecked = active == PowerPlanService.HighPerformance;
-    }
-
-    private async void PowerPlan_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not ToggleButton { Tag: string tag } || !Guid.TryParse(tag, out var plan))
-        {
-            return;
-        }
-
-        var ok = await Task.Run(() => PowerPlanService.SetActive(plan));
-        if (!ok)
-        {
-            ShowFooterStatus("Nie udało się zmienić planu zasilania (ten plan może być niedostępny na tym komputerze).");
-        }
-
-        await RefreshPowerPlanAsync();
     }
 
     // ---------- Scripts ----------

@@ -38,4 +38,4 @@ shipped with the app.
 
 ## NuGet packages
 
-- [NAudio](https://github.com/naudio/NAudio): MIT License
+None. The app uses only the .NET libraries. (NAudio was removed together with the volume slider, see `docs/REMOVED_FEATURES.md`.)

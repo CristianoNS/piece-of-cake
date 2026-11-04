@@ -37,8 +37,10 @@ Claude writes and maintains all the code. Talk to the owner in Polish.
 Only the owner can judge the look of the UI: ask for a screenshot when a visual change matters.
 
 ## Layout
-- `src/PieceOfCake/` the app. `Services/` Hue client, volume, power plans, metrics, tray, settings, startup,
+- `src/PieceOfCake/` the app. `Services/` Hue client, metrics, tray, settings, startup,
   passport report. `ViewModels/`, `MainWindow*.cs/xaml` panel UI. `Native/` P/Invoke and DWM effects.
+- `docs/REMOVED_FEATURES.md` features that were removed (volume slider, power plan) with their code, so they can be
+  restored. When you remove a feature, record it there first.
 - `src/PieceOfCake/Assets/` icons (`app.ico` pink, `tray-white.ico` / `tray-black.ico` switch with the Windows
   theme). Regenerate the tray icons with `tools/MakeTrayIcons.ps1`. After changing files in `Assets/` run
   `dotnet build -c Release -r win-x64 -t:Rebuild`, because the incremental build does not always notice them.
