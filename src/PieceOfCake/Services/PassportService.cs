@@ -214,12 +214,12 @@ public static class PassportService
         }
     }
 
-    private static string Cell(string? value) =>
+    internal static string Cell(string? value) =>
         (value ?? "").Replace("|", "\\|", StringComparison.Ordinal)
         .Replace("\r", " ", StringComparison.Ordinal)
         .Replace("\n", " ", StringComparison.Ordinal);
 
-    private static string FormatBytes(double bytes)
+    internal static string FormatBytes(double bytes)
     {
         string[] units = { "B", "KB", "MB", "GB", "TB" };
         var index = 0;

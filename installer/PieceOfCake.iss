@@ -27,7 +27,7 @@ Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayIcon={app}\{#MyAppExeName}
-SetupIconFile=..\Assets\app.ico
+SetupIconFile=..\src\PieceOfCake\Assets\app.ico
 ; Same name as the mutex used by the app, so Setup asks the user to close a running instance first.
 AppMutex=Local\PieceOfCake.SingleInstance
 CloseApplications=yes

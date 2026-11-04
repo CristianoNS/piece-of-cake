@@ -69,3 +69,7 @@ dotnet_diagnostic.MA0016.severity = none    # List<T> is needed for JSON setting
 [**/Native/*.cs]
 dotnet_diagnostic.CA1401.severity = none
 dotnet_diagnostic.SYSLIB1054.severity = none
+
+# Tests: descriptive method names with underscores are fine
+[tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none

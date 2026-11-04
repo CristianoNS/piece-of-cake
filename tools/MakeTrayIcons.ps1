@@ -3,7 +3,7 @@
 # Usage: powershell -File tools\MakeTrayIcons.ps1
 Add-Type -AssemblyName System.Drawing
 
-$root = Split-Path -Parent $PSScriptRoot
+$root = Join-Path (Split-Path -Parent $PSScriptRoot) 'src\PieceOfCake'
 $sizes = 16, 20, 24, 28, 32, 40, 48
 
 function New-Frame([int]$size, [Drawing.Color]$color) {
