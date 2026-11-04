@@ -11,11 +11,12 @@ if not exist "%TARGET%\PieceOfCake.exe" (
 )
 
 rem Build first: if it fails, the running app is left untouched.
-call build.bat
+call "%~dp0build.bat"
 if errorlevel 1 exit /b 1
 
 taskkill /IM PieceOfCake.exe /F >nul 2>&1
-timeout /t 1 /nobreak >nul
+rem ping instead of timeout: timeout fails when stdin is redirected (scripts, CI, Claude).
+ping -n 2 127.0.0.1 >nul
 
 robocopy "publish" "%TARGET%" /E /NFL /NDL /NJH /NJS /NP
 if errorlevel 8 (
@@ -23,6 +24,7 @@ if errorlevel 8 (
   exit /b 1
 )
 
-start "" "%TARGET%\PieceOfCake.exe"
+rem Redirect output so a caller capturing it does not wait for the app to exit.
+start "" "%TARGET%\PieceOfCake.exe" >nul 2>&1
 echo Done: updated and started.
 exit /b 0

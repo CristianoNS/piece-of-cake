@@ -17,7 +17,8 @@ Claude writes and maintains all the code. Talk to the owner in Polish.
 3. Run `.\deploy.bat`: it builds, closes the running app, copies changed files into
    `%LOCALAPPDATA%\Programs\Piece of Cake` and starts the app again.
 4. Check `%APPDATA%\PieceOfCake\error.log` for new errors.
-5. Commit with a short English message and push to `main`.
+5. Commit with a short English message and push to `main`. The owner has given standing permission: push
+   right away after every verified change, without asking for confirmation each time.
 Only the owner can judge the look of the UI: ask for a screenshot when a visual change matters.
 
 ## Layout
