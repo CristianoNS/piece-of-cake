@@ -20,20 +20,18 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16">
 
-                <!-- Procesor i pamięć -->
+                <!-- Procesor, pamięć i sieć -->
                 <TextBlock Text="System" Style="{StaticResource SectionHeader}"/>
-                <Grid Margin="0,0,0,4">
+                <Grid Margin="0,0,0,6">
                     <TextBlock Text="Procesor"/>
                     <TextBlock x:Name="CpuText" Text="0%" HorizontalAlignment="Right"
                                Foreground="{StaticResource SubTextBrush}"/>
                 </Grid>
-                <ProgressBar x:Name="CpuBar" Style="{StaticResource MeterBar}" Margin="0,0,0,10"/>
-                <Grid Margin="0,0,0,4">
+                <Grid Margin="0,0,0,6">
                     <TextBlock Text="Pamięć"/>
                     <TextBlock x:Name="RamText" Text="-" HorizontalAlignment="Right"
                                Foreground="{StaticResource SubTextBrush}"/>
                 </Grid>
-                <ProgressBar x:Name="RamBar" Style="{StaticResource MeterBar}" Margin="0,0,0,10"/>
                 <Grid Margin="0,0,0,16">
                     <TextBlock Text="Sieć"/>
                     <TextBlock x:Name="NetText" Text="–" HorizontalAlignment="Right"

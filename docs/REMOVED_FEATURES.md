@@ -377,6 +377,81 @@ Po usunięciu planu zasilania nic go już nie używa, więc też został skasowa
         </Style>
 ```
 
+
+---
+
+## 3. Paski przy procesorze i pamięci
+
+Ostatni commit z paskami: `6fba1b8`.
+
+**Co robiły:** pod wierszami „Procesor” i „Pamięć” w sekcji System był cienki pasek postępu (niebieski, na szarym tle)
+pokazujący obciążenie procesora i zajęcie pamięci w procentach. Obok nadal są wartości liczbowe, więc zostały
+tylko one, w tym samym stylu co wiersz „Sieć”. Paski były zwykłą ozdobą bez wpływu na zasoby.
+
+### Fragment `MainWindow.xaml`
+
+Cały blok sekcji System z paskami (`CpuBar`, `RamBar`):
+
+```xml
+                <!-- Procesor i pamięć -->
+                <TextBlock Text="System" Style="{StaticResource SectionHeader}"/>
+                <Grid Margin="0,0,0,4">
+                    <TextBlock Text="Procesor"/>
+                    <TextBlock x:Name="CpuText" Text="0%" HorizontalAlignment="Right"
+                               Foreground="{StaticResource SubTextBrush}"/>
+                </Grid>
+                <ProgressBar x:Name="CpuBar" Style="{StaticResource MeterBar}" Margin="0,0,0,10"/>
+                <Grid Margin="0,0,0,4">
+                    <TextBlock Text="Pamięć"/>
+                    <TextBlock x:Name="RamText" Text="-" HorizontalAlignment="Right"
+                               Foreground="{StaticResource SubTextBrush}"/>
+                </Grid>
+                <ProgressBar x:Name="RamBar" Style="{StaticResource MeterBar}" Margin="0,0,0,10"/>
+```
+
+### Styl `MeterBar` z `App.xaml`
+
+```xml
+        <Style x:Key="MeterBar" TargetType="ProgressBar">
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="100"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid>
+                            <Border x:Name="PART_Track" Background="{StaticResource TrackBrush}" CornerRadius="3"/>
+                            <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}"
+                                    CornerRadius="3" HorizontalAlignment="Left"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+```
+
+### Fragment `MainWindow.xaml.cs`
+
+W `UpdateMetrics` były dwie linie ustawiające paski: `CpuBar.Value = cpu;` oraz
+`RamBar.Value = used / total * 100.0;`. Cała metoda w wersji z paskami:
+
+```csharp
+    private void UpdateMetrics()
+    {
+        var cpu = _cpu.Sample();
+        CpuBar.Value = cpu;
+        CpuText.Text = $"{cpu:0}%";
+
+        if (MemoryMeter.TryGet(out var total, out var used) && total > 0)
+        {
+            const double gigabyte = 1024.0 * 1024.0 * 1024.0;
+            RamBar.Value = used / total * 100.0;
+            RamText.Text = $"{used / gigabyte:0.0} / {total / gigabyte:0.0} GB";
+        }
+    }
+```
+
 ---
 
 ## Pomysły na przyszłość

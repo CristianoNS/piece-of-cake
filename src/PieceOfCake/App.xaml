@@ -169,24 +169,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="MeterBar" TargetType="ProgressBar">
-            <Setter Property="Height" Value="6"/>
-            <Setter Property="Minimum" Value="0"/>
-            <Setter Property="Maximum" Value="100"/>
-            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ProgressBar">
-                        <Grid>
-                            <Border x:Name="PART_Track" Background="{StaticResource TrackBrush}" CornerRadius="3"/>
-                            <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}"
-                                    CornerRadius="3" HorizontalAlignment="Left"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <Style x:Key="DarkTextBox" TargetType="TextBox">
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="CaretBrush" Value="{StaticResource TextBrush}"/>

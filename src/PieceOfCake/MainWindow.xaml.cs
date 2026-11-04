@@ -173,13 +173,11 @@ public partial class MainWindow : Window
     private void UpdateMetrics()
     {
         var cpu = _cpu.Sample();
-        CpuBar.Value = cpu;
         CpuText.Text = $"{cpu:0}%";
 
         if (MemoryMeter.TryGet(out var total, out var used) && total > 0)
         {
             const double gigabyte = 1024.0 * 1024.0 * 1024.0;
-            RamBar.Value = used / total * 100.0;
             RamText.Text = $"{used / gigabyte:0.0} / {total / gigabyte:0.0} GB";
         }
     }
