@@ -7,11 +7,10 @@ własne skrypty, „Paszport komputera" i przełącznik autostartu.
 
 ## Uruchomienie
 
-- Gotowy folder `publish` (samodzielny, nie wymaga instalowania .NET). Uruchom `PieceOfCake.exe`, a w zasobniku
-  pojawi się ikona. Kliknięcie ikony otwiera i zamyka panel, `Esc` także go zamyka.
-- Kod aplikacji jest w `PieceOfCake.dll` (ok. 260 KB). Przy zmianach w programie wystarczy podmienić ten jeden plik
-  (po zamknięciu aplikacji). Reszta folderu to biblioteki .NET i zmienia się tylko przy zmianie wersji .NET lub paczek.
-- Z kodu: zainstaluj .NET 8 SDK i uruchom `build.bat` (wynik w folderze `publish`). Testy: `dotnet test PieceOfCake.sln`.
+- Gotowy plik `publish\PieceOfCake.exe` (jeden samodzielny plik z wbudowanym .NET, ok. 66 MB, nie wymaga
+  instalowania .NET). Uruchom go, a w zasobniku pojawi się ikona. Kliknięcie ikony otwiera i zamyka panel,
+  `Esc` także go zamyka.
+- Z kodu: zainstaluj .NET 10 SDK i uruchom `build.bat` (wynik w folderze `publish`). Testy: `dotnet test PieceOfCake.sln`.
 
 ## Instalator (opcjonalnie)
 

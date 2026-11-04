@@ -1,6 +1,6 @@
 @echo off
 rem Builds installer-output\PieceOfCake-Setup.exe with Inno Setup 6.
-rem Needs publish\PieceOfCake.exe. If it is missing, build.bat is run first (requires the .NET 8 SDK).
+rem Needs publish\PieceOfCake.exe. If it is missing, build.bat is run first (requires the .NET 10 SDK).
 setlocal
 cd /d "%~dp0.."
 
@@ -19,7 +19,7 @@ echo Done: installer-output\PieceOfCake-Setup.exe
 exit /b 0
 
 :noexe
-echo Missing publish\PieceOfCake.exe. Put the built file there or install the .NET 8 SDK and run build.bat.
+echo Missing publish\PieceOfCake.exe. Put the built file there or install the .NET 10 SDK and run build.bat.
 exit /b 1
 
 :noiscc

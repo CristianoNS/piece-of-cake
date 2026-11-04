@@ -1,6 +1,6 @@
 @echo off
 rem Builds the app, closes the running copy, updates the installed files and starts it again.
-rem Only changed files are copied, so a code-only change replaces just PieceOfCake.dll.
+rem The build is a single PieceOfCake.exe, so deploying replaces that one file.
 setlocal
 cd /d "%~dp0"
 set "TARGET=%LOCALAPPDATA%\Programs\Piece of Cake"

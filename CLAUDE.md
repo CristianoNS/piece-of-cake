@@ -1,6 +1,6 @@
 # Piece of Cake: instructions for Claude
 
-Personal Windows tray/flyout panel (C# / .NET 8 / WPF, WinForms NotifyIcon). The owner does not write C#;
+Personal Windows tray/flyout panel (C# / .NET 10 / WPF, WinForms NotifyIcon). The owner does not write C#;
 Claude writes and maintains all the code. Talk to the owner in Polish.
 
 ## Rules
@@ -37,8 +37,8 @@ Only the owner can judge the look of the UI: ask for a screenshot when a visual 
 - `tests/PieceOfCake.Tests/` xUnit tests. Internals are visible to the test project.
 - `PieceOfCake.sln`, `.editorconfig`, `Directory.Build.props`, `global.json` shared build settings.
   `.github/dependabot.yml` weekly updates.
-- `build.bat` publishes to `publish/`, `deploy.bat` installs it. `installer/PieceOfCake.iss` Inno Setup script
+- `build.bat` publishes one self-contained `PieceOfCake.exe` (single file, .NET 10 runtime included) to `publish/`, `deploy.bat` installs it. `installer/PieceOfCake.iss` Inno Setup script
   (needs the `publish` folder). Rebuild it only for a new full release.
 
 ## Release
-Push a tag `vX.Y.Z`. GitHub Actions builds the app and attaches `PieceOfCake-win-x64.zip` and `PieceOfCake.dll`.
+Push a tag `vX.Y.Z`. GitHub Actions builds the app and attaches `PieceOfCake-win-x64.zip` and the single-file `PieceOfCake.exe`.

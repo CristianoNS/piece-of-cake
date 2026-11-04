@@ -39,4 +39,3 @@ shipped with the app.
 ## NuGet packages
 
 - [NAudio](https://github.com/naudio/NAudio): MIT License
-- System.Security.Cryptography.ProtectedData: MIT License (Microsoft)
