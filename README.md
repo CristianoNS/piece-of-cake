@@ -1,8 +1,8 @@
-# Piece of Cake
+﻿# Piece of Cake
 
 Własny wysuwany panel w stylu szybkich ustawień Windows 11 (ikona przy zegarze).
 
-Zawiera: CPU/RAM, światła Philips Hue (pokoje, strefy, sceny),
+Zawiera: CPU, RAM i prędkość sieci, światła Philips Hue (pokoje, strefy, sceny),
 własne skrypty, „Paszport komputera" i przełącznik autostartu.
 
 ## Uruchomienie

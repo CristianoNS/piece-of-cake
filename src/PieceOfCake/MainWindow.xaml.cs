@@ -20,6 +20,7 @@ public partial class MainWindow : Window
 
     private readonly SettingsStore _settings;
     private readonly CpuMeter _cpu = new();
+    private readonly NetworkMeter _network = new();
     private readonly DispatcherTimer _metricsTimer;
     private readonly DispatcherTimer _statusTimer;
 
@@ -37,7 +38,11 @@ public partial class MainWindow : Window
         HueRoomsControl.ItemsSource = _rooms;
 
         _metricsTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _metricsTimer.Tick += (_, _) => UpdateMetrics();
+        _metricsTimer.Tick += (_, _) =>
+        {
+            UpdateMetrics();
+            UpdateNetwork();
+        };
 
         _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
         _statusTimer.Tick += (_, _) =>
@@ -105,6 +110,10 @@ public partial class MainWindow : Window
         PositionWindow();
         Activate();
 
+        // The adapter list is read once per opening; the timer then only reads two counters per adapter.
+        _network.Refresh();
+        NetText.Text = "–";
+
         _metricsTimer.Start();
         _ = RefreshAllAsync();
     }
@@ -153,6 +162,13 @@ public partial class MainWindow : Window
     }
 
     // ---------- CPU / RAM ----------
+
+    private void UpdateNetwork()
+    {
+        NetText.Text = _network.TrySample(out var download, out var upload)
+            ? $"↓ {NetworkMeter.FormatSpeed(download)}   ↑ {NetworkMeter.FormatSpeed(upload)}"
+            : "brak połączenia";
+    }
 
     private void UpdateMetrics()
     {
