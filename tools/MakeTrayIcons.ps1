@@ -17,7 +17,10 @@ function New-Frame([int]$size, [Drawing.Color]$color) {
     $pen = New-Object Drawing.Pen $color, $stroke
     $pen.LineJoin = 'Round'; $pen.StartCap = 'Round'; $pen.EndCap = 'Round'
 
-    function P($x, $y) { New-Object Drawing.PointF ([single]($x * $k)), ([single]($y * $k)) }
+    # Grow the drawing around the centre so it fills the cell like system icons do.
+    $grow = 1.12
+    function G($v) { 128 + ($v - 128) * $grow }
+    function P($x, $y) { New-Object Drawing.PointF ([single]((G $x) * $k)), ([single]((G $y) * $k)) }
 
     # Slice outline, drawn along the stroke centre line (256-unit grid).
     $outline = [Drawing.PointF[]]@(
@@ -25,8 +28,8 @@ function New-Frame([int]$size, [Drawing.Color]$color) {
         (P 226 98), (P 232 112), (P 232 220), (P 220 232), (P 36 232))
     $g.DrawLines($pen, $outline)
     # Cherry ring.
-    $r = 25 * $k
-    $g.DrawEllipse($pen, (88 * $k - $r), (74 * $k - $r), (2 * $r), (2 * $r))
+    $r = 25 * $grow * $k
+    $g.DrawEllipse($pen, ((G 88) * $k - $r), ((G 74) * $k - $r), (2 * $r), (2 * $r))
     # Cake layers.
     $g.DrawLine($pen, (P 24 140), (P 188 140))
     $g.DrawLine($pen, (P 24 188), (P 188 188))
