@@ -27,13 +27,17 @@ function New-Frame([int]$size, [Drawing.Color]$color) {
     # Design on a 16 x 16 grid (stroke centre line).
     # Slopes are 45 degrees so they stay clean on the pixel grid.
     $outline = [Drawing.PointF[]]@(
-        (P 14.5 14.5), (P 1.5 14.5), (P 1.5 8.5), (P 9.5 1.5), (P 14.5 6.5), (P 14.5 14.5))
+        (P 14.5 14.5), (P 1.5 14.5), (P 1.5 8.5), (P 11.5 3.5), (P 14.5 6.5), (P 14.5 14.5))
     $g.DrawLines($pen, $outline)
-    # Cherry: a solid square dot sitting on the left slope.
+    # Cherry: a small hollow diamond (four pixel blocks) resting on the top slope.
     $brush = New-Object Drawing.SolidBrush $color
     $g.SmoothingMode = 'None'
-    $x0 = [Math]::Round(4 * $k); $y0 = [Math]::Round(4 * $k); $d = [Math]::Max(2, [Math]::Round(2 * $k))
-    $g.FillRectangle($brush, $x0, $y0, $d, $d)
+    foreach ($cell in @(@(5, 3), @(4, 4), @(6, 4), @(5, 5))) {
+        $x0 = [Math]::Round($cell[0] * $k); $y0 = [Math]::Round($cell[1] * $k)
+        $w = [Math]::Max(1, [Math]::Round(($cell[0] + 1) * $k) - $x0)
+        $h = [Math]::Max(1, [Math]::Round(($cell[1] + 1) * $k) - $y0)
+        $g.FillRectangle($brush, $x0, $y0, $w, $h)
+    }
     $g.SmoothingMode = 'AntiAlias'
     # Cake layers.
     $g.DrawLine($pen, (P 1.5 10.5), (P 11.5 10.5))
