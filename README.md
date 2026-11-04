@@ -71,3 +71,7 @@ Kształt pochodzi z Lucide (licencja ISC), szczegóły w `THIRD_PARTY_NOTICES.md
 - Ustawienia i log błędów (`error.log`): `%APPDATA%\PieceOfCake`
 - Autostart: wpis w `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (można go też wyłączyć w
   Ustawienia → Aplikacje → Autostart)
+
+## Licencja
+
+MIT, zobacz plik `LICENSE`. Licencje składników zewnętrznych są w `THIRD_PARTY_NOTICES.md`.

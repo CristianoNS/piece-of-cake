@@ -10,6 +10,12 @@ Claude writes and maintains all the code. Talk to the owner in Polish.
 - User-facing UI text is Polish; code, comments and commit messages are English.
 - Never commit secrets. The Hue app key lives only in `%APPDATA%\PieceOfCake\settings.json` (DPAPI). This repo is public.
 - Keep third-party licenses up to date in `THIRD_PARTY_NOTICES.md`.
+- Code quality is enforced at build time: `Directory.Build.props` turns warnings into errors and adds the
+  Roslynator and Meziantou analyzers; style rules live in `.editorconfig`. Fix findings in the code. Suppress a
+  rule only with a short justification (`[SuppressMessage]`, `#pragma` with a comment, or `.editorconfig` for
+  the whole project).
+- One type per file, and the file name matches the type name.
+- The app is MIT licensed (`LICENSE`).
 
 ## Workflow
 1. Make the change.
@@ -25,6 +31,9 @@ Only the owner can judge the look of the UI: ask for a screenshot when a visual 
 - `Services/` Hue client, volume, power plans, metrics, tray, settings, startup, passport report.
 - `ViewModels/`, `MainWindow*.cs/xaml` panel UI. `Native/` P/Invoke and DWM effects.
 - `Assets/` icons (`app.ico` pink, `tray-white.ico` / `tray-black.ico` switch with the Windows theme).
+  Regenerate the tray icons with `tools/MakeTrayIcons.ps1`. After changing files in `Assets/` run
+  `dotnet build -c Release -r win-x64 -t:Rebuild`, because the incremental build does not always notice them.
+- `.editorconfig`, `Directory.Build.props`, `global.json` shared build settings. `.github/dependabot.yml` weekly updates.
 - `installer/PieceOfCake.iss` Inno Setup script (needs the `publish` folder). Rebuild it only for a new full release.
 
 ## Release

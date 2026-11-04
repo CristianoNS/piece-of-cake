@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using PieceOfCake.Services;
 
 namespace PieceOfCake;
 
+[SuppressMessage("Design", "CA1001", Justification = "Resources are released in OnExit.")]
 public partial class App : Application
 {
     private Mutex? _mutex;

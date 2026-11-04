@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -32,9 +33,9 @@ public static class PassportService
     private static string Build()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"# Paszport komputera: {Environment.MachineName}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"# Paszport komputera: {Environment.MachineName}");
         sb.AppendLine();
-        sb.AppendLine($"Wygenerowano: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Wygenerowano: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
         sb.AppendLine();
 
         AppendSystem(sb);
@@ -64,7 +65,7 @@ public static class PassportService
         }
 
         // Windows 11 still reports "Windows 10" in ProductName.
-        if (int.TryParse(build.Split('.')[0], out var buildNumber) && buildNumber >= 22000)
+        if (int.TryParse(build.Split('.')[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var buildNumber) && buildNumber >= 22000)
         {
             product = product.Replace("Windows 10", "Windows 11", StringComparison.Ordinal);
         }
@@ -81,14 +82,14 @@ public static class PassportService
         sb.AppendLine();
         sb.AppendLine("| Pozycja | Wartość |");
         sb.AppendLine("|---|---|");
-        sb.AppendLine($"| Nazwa komputera | {Cell(Environment.MachineName)} |");
-        sb.AppendLine($"| Użytkownik | {Cell(Environment.UserName)} |");
-        sb.AppendLine($"| System | {Cell(product)} {Cell(version)} |");
-        sb.AppendLine($"| Kompilacja | {Cell(build)} |");
-        sb.AppendLine($"| Architektura | {(Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit")} |");
-        sb.AppendLine($"| Procesor | {Cell(cpu)} |");
-        sb.AppendLine($"| Wątki logiczne | {Environment.ProcessorCount} |");
-        sb.AppendLine($"| Pamięć RAM | {ram} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| Nazwa komputera | {Cell(Environment.MachineName)} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| Użytkownik | {Cell(Environment.UserName)} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| System | {Cell(product)} {Cell(version)} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| Kompilacja | {Cell(build)} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| Architektura | {(Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit")} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| Procesor | {Cell(cpu)} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| Wątki logiczne | {Environment.ProcessorCount} |");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"| Pamięć RAM | {ram} |");
         sb.AppendLine();
     }
 
@@ -109,6 +110,7 @@ public static class PassportService
                 }
 
                 sb.AppendLine(
+                    CultureInfo.InvariantCulture,
                     $"| {Cell(drive.Name)} | {Cell(drive.VolumeLabel)} | {Cell(drive.DriveFormat)} | " +
                     $"{FormatBytes(drive.TotalSize)} | {FormatBytes(drive.TotalFreeSpace)} |");
             }
@@ -141,14 +143,14 @@ public static class PassportService
                     continue;
                 }
 
-                var mac = string.Join("-", nic.GetPhysicalAddress().GetAddressBytes().Select(b => b.ToString("X2")));
+                var mac = string.Join("-", nic.GetPhysicalAddress().GetAddressBytes().Select(b => b.ToString("X2", CultureInfo.InvariantCulture)));
                 var addresses = string.Join(
                     ", ",
                     nic.GetIPProperties().UnicastAddresses
                         .Where(a => a.Address.AddressFamily == AddressFamily.InterNetwork)
                         .Select(a => a.Address.ToString()));
 
-                sb.AppendLine($"| {Cell(nic.Name)} | {nic.NetworkInterfaceType} | {Cell(mac)} | {Cell(addresses)} |");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"| {Cell(nic.Name)} | {nic.NetworkInterfaceType} | {Cell(mac)} | {Cell(addresses)} |");
             }
         }
         catch (NetworkInformationException ex)
@@ -202,13 +204,13 @@ public static class PassportService
             .OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
 
-        sb.AppendLine($"## Zainstalowane programy ({distinct.Count})");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"## Zainstalowane programy ({distinct.Count})");
         sb.AppendLine();
         sb.AppendLine("| Program | Wersja | Wydawca |");
         sb.AppendLine("|---|---|---|");
         foreach (var p in distinct)
         {
-            sb.AppendLine($"| {Cell(p.Name)} | {Cell(p.Version)} | {Cell(p.Publisher)} |");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"| {Cell(p.Name)} | {Cell(p.Version)} | {Cell(p.Publisher)} |");
         }
     }
 

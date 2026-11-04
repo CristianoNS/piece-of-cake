@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -13,6 +14,7 @@ using PieceOfCake.ViewModels;
 
 namespace PieceOfCake;
 
+[SuppressMessage("Design", "CA1001", Justification = "Resources are released when the window closes.")]
 public partial class MainWindow
 {
     private readonly ObservableCollection<HueRoomVm> _rooms = new();

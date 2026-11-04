@@ -81,7 +81,7 @@ public sealed class TrayService : IDisposable
         }
 
         // SystemEvents raises this on its own thread; the icon must be updated on the UI thread.
-        System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(RefreshIcon));
+        _ = System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(RefreshIcon));
     }
 
     private void RefreshIcon()

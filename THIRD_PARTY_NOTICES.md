@@ -27,6 +27,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 The pink color (#FF6DC6) was taken from the "cupcake" emoji of
 [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (MIT License); no artwork from it is included.
 
+The tray icons (`tray-white.ico`, `tray-black.ico`) are redrawn on the pixel grid by `tools/MakeTrayIcons.ps1`
+and only follow the same idea; the app icon (`app.ico`) is the Lucide shape.
+
+## Build-time analyzers
+
+[Roslynator.Analyzers](https://github.com/dotnet/roslynator) (Apache 2.0) and
+[Meziantou.Analyzer](https://github.com/meziantou/Meziantou.Analyzer) (MIT) run only during the build and are not
+shipped with the app.
+
 ## NuGet packages
 
 - [NAudio](https://github.com/naudio/NAudio): MIT License

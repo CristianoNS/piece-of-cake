@@ -14,33 +14,10 @@ using System.Threading.Tasks;
 
 namespace PieceOfCake.Services;
 
-public sealed class HueException : Exception
-{
-    public HueException(string message, bool unauthorized = false, Exception? inner = null)
-        : base(message, inner)
-    {
-        Unauthorized = unauthorized;
-    }
-
-    /// <summary>True when the stored key or certificate is no longer accepted and pairing must be redone.</summary>
-    public bool Unauthorized { get; }
-}
-
-public sealed record HueSceneInfo(string Id, string Name);
-
-public sealed record HueRoomInfo(
-    string Id,
-    string Name,
-    string GroupedLightId,
-    bool IsOn,
-    double Brightness,
-    IReadOnlyList<HueSceneInfo> Scenes);
-
 /// <summary>
 /// Minimal client for the local Philips Hue Bridge API (v2 over HTTPS).
 /// The bridge uses a self-signed certificate, so the certificate is pinned on first use
 /// (trust-on-first-use) and certificate errors are only tolerated for the bridge host itself.
-/// </summary>
 public sealed class HueClient : IDisposable
 {
     private const string ApplicationKeyHeader = "hue-application-key";
@@ -59,10 +36,13 @@ public sealed class HueClient : IDisposable
         _host = host;
         _pinnedThumbprint = string.IsNullOrWhiteSpace(pinnedThumbprint) ? null : pinnedThumbprint;
 
+        // Custom validation is intentional: the bridge certificate is self-signed and is pinned instead (see class summary).
+#pragma warning disable MA0039
         var handler = new HttpClientHandler
         {
             ServerCertificateCustomValidationCallback = ValidateCertificate,
         };
+#pragma warning restore MA0039
 
         _http = new HttpClient(handler)
         {
@@ -393,7 +373,7 @@ public sealed class HueClient : IDisposable
         foreach (var service in services.EnumerateArray())
         {
             if (service.ValueKind == JsonValueKind.Object
-                && GetString(service, "rtype") == "grouped_light")
+                && string.Equals(GetString(service, "rtype"), "grouped_light", StringComparison.Ordinal))
             {
                 return GetString(service, "rid");
             }

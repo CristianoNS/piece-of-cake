@@ -7,21 +7,6 @@ using System.Text.Json;
 
 namespace PieceOfCake.Services;
 
-public sealed class ScriptEntry
-{
-    public string Name { get; set; } = "";
-    public string Path { get; set; } = "";
-    public string Arguments { get; set; } = "";
-}
-
-public sealed class AppSettings
-{
-    public string BridgeIp { get; set; } = "";
-    public string BridgeCertThumbprint { get; set; } = "";
-    public string ProtectedAppKey { get; set; } = "";
-    public List<ScriptEntry> Scripts { get; set; } = new();
-}
-
 public sealed class SettingsStore
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };

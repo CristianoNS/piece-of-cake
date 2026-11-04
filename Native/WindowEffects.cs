@@ -25,10 +25,10 @@ internal static class WindowEffects
         try
         {
             var exStyle = NativeMethods.GetWindowLong(hwnd, NativeMethods.GwlExStyle);
-            NativeMethods.SetWindowLong(hwnd, NativeMethods.GwlExStyle, exStyle | NativeMethods.WsExToolWindow);
+            _ = NativeMethods.SetWindowLong(hwnd, NativeMethods.GwlExStyle, exStyle | NativeMethods.WsExToolWindow);
 
             var dark = 1;
-            NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaUseImmersiveDarkMode, ref dark, sizeof(int));
+            _ = NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaUseImmersiveDarkMode, ref dark, sizeof(int));
 
             if (Environment.OSVersion.Version.Build < MinBuildForBackdrop)
             {
@@ -36,7 +36,7 @@ internal static class WindowEffects
             }
 
             var corner = NativeMethods.DwmwcpRound;
-            NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaWindowCornerPreference, ref corner, sizeof(int));
+            _ = NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaWindowCornerPreference, ref corner, sizeof(int));
 
             var backdrop = NativeMethods.DwmsbtTransientWindow;
             var result = NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaSystemBackdropType, ref backdrop, sizeof(int));

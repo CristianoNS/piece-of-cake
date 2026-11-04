@@ -12,7 +12,7 @@ public static class PowerPlanService
     public static readonly Guid HighPerformance = new("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
 
     private static readonly Regex GuidPattern = new(
-        "[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}", RegexOptions.Compiled);
+        "[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     public static Guid? GetActive()
     {
