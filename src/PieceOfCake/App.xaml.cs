@@ -33,6 +33,24 @@ public partial class App : Application
             args.Handled = true;
         };
 
+        // Errors outside the UI thread: log them instead of losing them. The first one ends the process.
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            if (args.ExceptionObject is Exception exception)
+            {
+                Logger.Log(exception);
+            }
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Logger.Log(args.Exception);
+            args.SetObserved();
+        };
+
+        // Tray icon (WinForms) callbacks would otherwise show the default WinForms error dialog.
+        System.Windows.Forms.Application.ThreadException += (_, args) => Logger.Log(args.Exception);
+
         _mutex = new Mutex(true, @"Local\PieceOfCake.SingleInstance", out var createdNew);
         if (!createdNew)
         {

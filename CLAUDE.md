@@ -15,6 +15,9 @@ Claude writes and maintains all the code. Talk to the owner in Polish.
   rule only with a short justification (`[SuppressMessage]`, `#pragma` with a comment, or `.editorconfig` for
   the whole project).
 - One type per file, and the file name matches the type name.
+- Errors: log them with `Logger.Log` (`error.log` rotates at 512 KB into `error.log.old`). `App` also logs UI-thread,
+  background-thread, unobserved-task and tray-icon exceptions. Catch specific exceptions at call sites and show a
+  Polish message to the user; an `async void` handler must catch everything it can expect.
 - The app is MIT licensed (`LICENSE`).
 - Keep the footprint tiny; measure before and after any change that could affect it (private memory, working set,
   idle CPU). Current design: nothing runs while the panel is hidden, `MainWindow` is created on first open,
