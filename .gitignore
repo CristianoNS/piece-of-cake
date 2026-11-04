@@ -6,3 +6,4 @@ installer-output/
 *.user
 *.suo
 .claude/settings.local.json
+graphify-out/

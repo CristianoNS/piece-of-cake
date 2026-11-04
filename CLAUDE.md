@@ -36,6 +36,16 @@ Claude writes and maintains all the code. Talk to the owner in Polish.
    right away after every verified change, without asking for confirmation each time.
 Only the owner can judge the look of the UI: ask for a screenshot when a visual change matters.
 
+## Code graph (Graphify)
+A dev-only knowledge graph of the C# code (tree-sitter, fully offline, no LLM, no account). It never touches the app.
+- Installed in its own venv: `C:\Users\Admin\.graphify-venv` (PyPI `graphifyy`). No global hooks or skills were installed.
+- Use it to see how things connect before grepping: `graphify query "<question>"`, `graphify explain "<Symbol>"`,
+  `graphify path "A" "B"` (exe: `C:\Users\Admin\.graphify-venv\Scripts\graphify.exe`; set `GRAPHIFY_BACKEND=none`
+  and `PYTHONUTF8=1`). The overview is in `graphify-out/GRAPH_REPORT.md`.
+- Refresh after code changes: `graphify update .` (no LLM). `graphify-out/` is git-ignored; `.graphifyignore` skips
+  build output and docs.
+- Never run `graphify extract` without `--code-only` and `GRAPHIFY_BACKEND=none`: docs would be sent to an LLM.
+
 ## Layout
 - `src/PieceOfCake/` the app. `Services/` Hue client, metrics, tray, settings, startup,
   passport report. `ViewModels/`, `MainWindow*.cs/xaml` panel UI. `Native/` P/Invoke and DWM effects.
