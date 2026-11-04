@@ -124,6 +124,9 @@ public partial class MainWindow : Window
         _metricsTimer.Stop();
         Hide();
         _lastHiddenUtc = DateTime.UtcNow;
+
+        // Give memory back once the panel is hidden; low priority so the hide itself is not delayed.
+        _ = Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, MemoryTrimmer.Trim);
     }
 
     private void PositionWindow()

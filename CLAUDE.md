@@ -16,6 +16,11 @@ Claude writes and maintains all the code. Talk to the owner in Polish.
   the whole project).
 - One type per file, and the file name matches the type name.
 - The app is MIT licensed (`LICENSE`).
+- Keep the footprint tiny; measure before and after any change that could affect it (private memory, working set,
+  idle CPU). Current design: nothing runs while the panel is hidden, `MainWindow` is created on first open,
+  memory is trimmed after hiding (`MemoryTrimmer`), WPF renders in software mode, the single-file build is not
+  compressed. Measured in background mode: about 17 MB private and 7 MB working set, 0 ms CPU when idle.
+  Do not add timers, polling or new dependencies without a clear need.
 
 ## Workflow
 1. Make the change.

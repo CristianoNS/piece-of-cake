@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 using PieceOfCake.Services;
 
 namespace PieceOfCake;
@@ -16,10 +18,14 @@ public partial class App : Application
     private Mutex? _mutex;
     private TrayService? _tray;
     private MainWindow? _window;
+    private SettingsStore? _settings;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // The flyout is small and mostly static: software rendering avoids loading the GPU driver (about 18 MB less).
+        RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
 
         DispatcherUnhandledException += (_, args) =>
         {
@@ -46,19 +52,24 @@ public partial class App : Application
                 await Task.Delay(TimeSpan.FromSeconds(2));
             }
 
-            var settings = new SettingsStore();
-            settings.Load();
+            _settings = new SettingsStore();
+            _settings.Load();
             StartupManager.MigrateLegacyEntry();
 
-            _window = new MainWindow(settings);
             _tray = new TrayService();
-            _tray.OpenRequested += () => _window.ToggleFlyout();
+            _tray.OpenRequested += ToggleFlyout;
             _tray.SettingsFolderRequested += OpenSettingsFolder;
             _tray.ExitRequested += Shutdown;
 
             if (!background)
             {
-                _window.ToggleFlyout();
+                ToggleFlyout();
+            }
+            else
+            {
+                // The window is created on first use, so a background start only holds the tray icon.
+                await Task.Delay(TimeSpan.FromSeconds(3));
+                MemoryTrimmer.Trim();
             }
         }
         catch (Exception ex)
@@ -78,6 +89,19 @@ public partial class App : Application
         _tray?.Dispose();
         _mutex?.Dispose();
         base.OnExit(e);
+    }
+
+    private void ToggleFlyout()
+    {
+        try
+        {
+            _window ??= new MainWindow(_settings!);
+            _window.ToggleFlyout();
+        }
+        catch (Exception ex)
+        {
+            Logger.Log(ex);
+        }
     }
 
     private static void OpenSettingsFolder()
