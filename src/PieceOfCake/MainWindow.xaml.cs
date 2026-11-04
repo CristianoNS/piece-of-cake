@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using PieceOfCake.Native;
 using PieceOfCake.Services;
@@ -17,6 +18,8 @@ namespace PieceOfCake;
 public partial class MainWindow : Window
 {
     private const double ScreenMargin = 12;
+    private const double SlideDistance = 28;
+    private static readonly Duration OpenDuration = new(TimeSpan.FromMilliseconds(180));
 
     private readonly SettingsStore _settings;
     private readonly CpuMeter _cpu = new();
@@ -105,10 +108,13 @@ public partial class MainWindow : Window
     {
         AutostartToggle.IsChecked = StartupManager.IsEnabled();
 
+        // Start fully transparent so the first frame does not flash at a stale position or size.
+        RootBorder.Opacity = 0;
         Show();
         UpdateLayout();
         PositionWindow();
         Activate();
+        PlayOpenAnimation();
 
         // The adapter list is read once per opening; the timer then only reads two counters per adapter.
         _network.Refresh();
@@ -126,11 +132,26 @@ public partial class MainWindow : Window
         }
 
         _metricsTimer.Stop();
+        BeginAnimation(TopProperty, null);
+        RootBorder.BeginAnimation(OpacityProperty, null);
         Hide();
         _lastHiddenUtc = DateTime.UtcNow;
 
         // Give memory back once the panel is hidden; low priority so the hide itself is not delayed.
         _ = Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, MemoryTrimmer.Trim);
+    }
+
+    /// <summary>Slides the panel up a few pixels while it fades in, like the system flyouts.</summary>
+    private void PlayOpenAnimation()
+    {
+        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        var target = Top;
+
+        RootBorder.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, OpenDuration) { EasingFunction = easing });
+        BeginAnimation(TopProperty, new DoubleAnimation(target + SlideDistance, target, OpenDuration)
+        {
+            EasingFunction = easing,
+        });
     }
 
     private void PositionWindow()
