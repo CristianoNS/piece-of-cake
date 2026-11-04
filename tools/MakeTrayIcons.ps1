@@ -1,6 +1,5 @@
 # Regenerates Assets\tray-white.ico and Assets\tray-black.ico (cake-slice outline).
-# Drawn directly at each size on the pixel grid with whole-pixel strokes, like Windows system tray icons
-# (crisp 1 px lines; supersampling made them blurry and grey).
+# Stroke is ~6% of the icon size to match thin Windows system tray icons.
 # Usage: powershell -File tools\MakeTrayIcons.ps1
 Add-Type -AssemblyName System.Drawing
 
@@ -8,42 +7,40 @@ $root = Split-Path -Parent $PSScriptRoot
 $sizes = 16, 20, 24, 28, 32, 40, 48
 
 function New-Frame([int]$size, [Drawing.Color]$color) {
-    $bmp = New-Object Drawing.Bitmap $size, $size, ([Drawing.Imaging.PixelFormat]::Format32bppArgb)
-    $g = [Drawing.Graphics]::FromImage($bmp)
+    $ss = 8
+    $px = $size * $ss
+    $big = New-Object Drawing.Bitmap $px, $px, ([Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $g = [Drawing.Graphics]::FromImage($big)
     $g.SmoothingMode = 'AntiAlias'
-    $g.PixelOffsetMode = 'Half'
-    $k = $size / 16.0
-    $width = [Math]::Max(1, [Math]::Floor($size / 16.0 + 0.1))
-    $pen = New-Object Drawing.Pen $color, $width
-    $pen.LineJoin = 'Round'; $pen.StartCap = 'Flat'; $pen.EndCap = 'Flat'
+    $k = $px / 256.0
+    $stroke = [Math]::Max(1.0, $size * 0.0625) * $ss
+    $pen = New-Object Drawing.Pen $color, $stroke
+    $pen.LineJoin = 'Round'; $pen.StartCap = 'Round'; $pen.EndCap = 'Round'
 
-    # Odd stroke widths sit on pixel centres, even ones on pixel edges, so lines stay crisp.
-    function Snap($v) {
-        $s = $v * $k
-        if ($width % 2 -eq 1) { [Math]::Floor($s) + 0.5 } else { [Math]::Round($s) }
-    }
-    function P($x, $y) { New-Object Drawing.PointF ([single](Snap $x)), ([single](Snap $y)) }
+    # Grow the drawing around the centre so it fills the cell like system icons do.
+    $grow = 1.12
+    function G($v) { 128 + ($v - 128) * $grow }
+    function P($x, $y) { New-Object Drawing.PointF ([single]((G $x) * $k)), ([single]((G $y) * $k)) }
 
-    # Design on a 16 x 16 grid (stroke centre line).
-    # Slopes are 45 degrees so they stay clean on the pixel grid.
+    # Slice outline, drawn along the stroke centre line (256-unit grid).
     $outline = [Drawing.PointF[]]@(
-        (P 14.5 14.5), (P 1.5 14.5), (P 1.5 8.5), (P 11.5 3.5), (P 14.5 6.5), (P 14.5 14.5))
+        (P 36 232), (P 24 220), (P 24 134), (P 68 100), (P 118 52), (P 138 30), (P 150 24), (P 162 30),
+        (P 226 98), (P 232 112), (P 232 220), (P 220 232), (P 36 232))
     $g.DrawLines($pen, $outline)
-    # Cherry: a small hollow diamond (four pixel blocks) resting on the top slope.
-    $brush = New-Object Drawing.SolidBrush $color
-    $g.SmoothingMode = 'None'
-    foreach ($cell in @(@(5, 3), @(4, 4), @(6, 4), @(5, 5))) {
-        $x0 = [Math]::Round($cell[0] * $k); $y0 = [Math]::Round($cell[1] * $k)
-        $w = [Math]::Max(1, [Math]::Round(($cell[0] + 1) * $k) - $x0)
-        $h = [Math]::Max(1, [Math]::Round(($cell[1] + 1) * $k) - $y0)
-        $g.FillRectangle($brush, $x0, $y0, $w, $h)
-    }
-    $g.SmoothingMode = 'AntiAlias'
+    # Cherry ring.
+    $r = 25 * $grow * $k
+    $g.DrawEllipse($pen, ((G 88) * $k - $r), ((G 74) * $k - $r), (2 * $r), (2 * $r))
     # Cake layers.
-    $g.DrawLine($pen, (P 1.5 10.5), (P 11.5 10.5))
-    $g.DrawLine($pen, (P 1.5 12.5), (P 11.5 12.5))
+    $g.DrawLine($pen, (P 24 140), (P 188 140))
+    $g.DrawLine($pen, (P 24 188), (P 188 188))
     $g.Dispose()
-    return $bmp
+
+    $small = New-Object Drawing.Bitmap $size, $size, ([Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $g2 = [Drawing.Graphics]::FromImage($small)
+    $g2.InterpolationMode = 'HighQualityBicubic'; $g2.PixelOffsetMode = 'HighQuality'
+    $g2.DrawImage($big, 0, 0, $size, $size)
+    $g2.Dispose(); $big.Dispose()
+    return $small
 }
 
 function Save-Ico([string]$path, [Drawing.Color]$color) {
