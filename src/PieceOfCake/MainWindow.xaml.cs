@@ -18,8 +18,8 @@ namespace PieceOfCake;
 public partial class MainWindow : Window
 {
     private const double ScreenMargin = 12;
-    private const double SlideDistance = 28;
-    private static readonly Duration OpenDuration = new(TimeSpan.FromMilliseconds(180));
+    private const double SlideDistance = 40;
+    private static readonly Duration OpenDuration = new(TimeSpan.FromMilliseconds(230));
 
     private readonly SettingsStore _settings;
     private readonly CpuMeter _cpu = new();
@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _statusTimer;
 
     private DateTime _lastHiddenUtc = DateTime.MinValue;
+    private bool _opening;
 
     public MainWindow(SettingsStore settings)
     {
@@ -56,7 +57,7 @@ public partial class MainWindow : Window
 
         SizeChanged += (_, _) =>
         {
-            if (IsVisible)
+            if (IsVisible && !_opening)
             {
                 PositionWindow();
             }
@@ -108,20 +109,31 @@ public partial class MainWindow : Window
     {
         AutostartToggle.IsChecked = StartupManager.IsEnabled();
 
-        // Start fully transparent so the first frame does not flash at a stale position or size.
+        // Keep the first frame invisible and off screen until the layout is known, so nothing flashes.
         RootBorder.Opacity = 0;
+        Left = -32000;
         Show();
         UpdateLayout();
         PositionWindow();
-        Activate();
         PlayOpenAnimation();
+        Activate();
+
+        // Slow work waits until the first frame is on screen.
+        _ = Dispatcher.BeginInvoke(DispatcherPriority.Background, StartMetrics);
+        _ = RefreshAllAsync();
+    }
+
+    private void StartMetrics()
+    {
+        if (!IsVisible)
+        {
+            return;
+        }
 
         // The adapter list is read once per opening; the timer then only reads two counters per adapter.
         _network.Refresh();
         NetText.Text = "–";
-
         _metricsTimer.Start();
-        _ = RefreshAllAsync();
     }
 
     private void HideFlyout()
@@ -132,6 +144,7 @@ public partial class MainWindow : Window
         }
 
         _metricsTimer.Stop();
+        _opening = false;
         BeginAnimation(TopProperty, null);
         RootBorder.BeginAnimation(OpacityProperty, null);
         Hide();
@@ -146,12 +159,20 @@ public partial class MainWindow : Window
     {
         var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
         var target = Top;
+        _opening = true;
+        Top = target + SlideDistance;
+
+        var slide = new DoubleAnimation(target + SlideDistance, target, OpenDuration) { EasingFunction = easing };
+        slide.Completed += (_, _) =>
+        {
+            // Drop the animation and settle on the real position (the height may have changed meanwhile).
+            _opening = false;
+            BeginAnimation(TopProperty, null);
+            PositionWindow();
+        };
 
         RootBorder.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, OpenDuration) { EasingFunction = easing });
-        BeginAnimation(TopProperty, new DoubleAnimation(target + SlideDistance, target, OpenDuration)
-        {
-            EasingFunction = easing,
-        });
+        BeginAnimation(TopProperty, slide);
     }
 
     private void PositionWindow()
