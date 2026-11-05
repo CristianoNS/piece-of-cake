@@ -87,6 +87,8 @@ public partial class App : Application
             {
                 // The window is created on first use, so a background start only holds the tray icon.
                 await Task.Delay(TimeSpan.FromSeconds(3));
+                _window ??= new MainWindow(_settings);
+                _window.Warm();
                 MemoryTrimmer.Trim();
             }
         }

@@ -88,6 +88,20 @@ public partial class MainWindow : Window
         ShowFlyout();
     }
 
+    /// <summary>
+    /// Builds the window, its native handle and the first layout while it is invisible, so the first real
+    /// opening is as fast as the later ones. Call it once after a background start.
+    /// </summary>
+    public void Warm()
+    {
+        ShowActivated = false;
+        Left = -32000;
+        Show();
+        UpdateLayout();
+        Hide();
+        ShowActivated = true;
+    }
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);

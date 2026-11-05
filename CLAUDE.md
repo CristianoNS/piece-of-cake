@@ -20,9 +20,11 @@ Claude writes and maintains all the code. Talk to the owner in Polish.
   Polish message to the user; an `async void` handler must catch everything it can expect.
 - The app is MIT licensed (`LICENSE`).
 - Keep the footprint tiny; measure before and after any change that could affect it (private memory, working set,
-  idle CPU). Current design: nothing runs while the panel is hidden, `MainWindow` is created on first open,
-  memory is trimmed after hiding (`MemoryTrimmer`), WPF renders in software mode, the single-file build is not
-  compressed. Measured in background mode: about 17 MB private and 7 MB working set, 0 ms CPU when idle.
+  idle CPU). Current design: nothing runs while the panel is hidden, `MainWindow` is built invisibly 3 s after a
+  background start (`MainWindow.Warm`) so the first opening takes about 30 ms instead of about 245 ms (the owner
+  chose smoothness over memory), memory is trimmed after hiding (`MemoryTrimmer`), WPF renders in software mode,
+  the single-file build is not compressed. Measured in background mode: about 59 MB private and 30 MB working
+  set after warm-up (before warm-up: 17 MB and 7 MB), 0 ms CPU when idle.
   Do not add timers, polling or new dependencies without a clear need.
 
 ## Workflow
