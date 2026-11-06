@@ -12,7 +12,7 @@ internal static class ThemePalette
 
     /// <summary>Opaque background used when transparency effects are off in Windows.</summary>
     public static Color SolidBackground(bool light) =>
-        light ? Color.FromRgb(0xF2, 0xF2, 0xF2) : Color.FromRgb(0x2B, 0x2B, 0x2B);
+        light ? Color.FromRgb(0xF2, 0xF2, 0xF2) : Color.FromRgb(0x24, 0x24, 0x24);
 
     public static void Apply(ResourceDictionary resources, bool light, Color accent)
     {
@@ -27,12 +27,12 @@ internal static class ThemePalette
         Set(resources, "TilePressedBrush", light ? Color.FromArgb(0x0A, 0, 0, 0) : Color.FromArgb(0x12, 0xFF, 0xFF, 0xFF));
         Set(resources, "TrackBrush", light ? Color.FromArgb(0x33, 0, 0, 0) : Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF));
 
-        Set(resources, "TileOffBrush", light ? Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x12, 0xFF, 0xFF, 0xFF));
+        Set(resources, "TileOffBrush", light ? Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x10, 0xFF, 0xFF, 0xFF));
         Set(resources, "TileOffBorderBrush", light ? Color.FromArgb(0x0F, 0, 0, 0) : Color.FromArgb(0x1F, 0xFF, 0xFF, 0xFF));
-        Set(resources, "DividerBrush", light ? Color.FromArgb(0x10, 0, 0, 0) : Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF));
-        Set(resources, "FooterBrush", light ? Color.FromArgb(0x06, 0, 0, 0) : Color.FromArgb(0x66, 0, 0, 0));
+        Set(resources, "DividerBrush", light ? Color.FromArgb(0x10, 0, 0, 0) : Color.FromArgb(0x15, 0xFF, 0xFF, 0xFF));
+        Set(resources, "FooterBrush", light ? Color.FromArgb(0x06, 0, 0, 0) : Color.FromArgb(0x38, 0, 0, 0));
 
-        Set(resources, "SliderTrackBrush", light ? Color.FromArgb(0x72, 0, 0, 0) : Color.FromArgb(0x9E, 0xFF, 0xFF, 0xFF));
+        Set(resources, "SliderTrackBrush", light ? Color.FromArgb(0x72, 0, 0, 0) : Color.FromArgb(0x8D, 0xFF, 0xFF, 0xFF));
         Set(resources, "SliderThumbRingBrush", light ? Color.FromRgb(0xFF, 0xFF, 0xFF) : Color.FromRgb(0x45, 0x45, 0x45));
     }
 
