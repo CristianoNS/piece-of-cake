@@ -1,11 +1,11 @@
 PackageIdentifier: CristianoNS.PieceOfCake
-PackageVersion: 0.2.1
+PackageVersion: 0.3.0
 InstallerType: portable
 Commands:
 - PieceOfCake
 Installers:
 - Architecture: x64
-  InstallerUrl: https://github.com/CristianoNS/piece-of-cake/releases/download/v0.2.1/PieceOfCake.exe
-  InstallerSha256: 5D21A5B71967F034847B2EBACA705443A41393BAFA2260DE4AE8BD92B6671C8A
+  InstallerUrl: https://github.com/CristianoNS/piece-of-cake/releases/download/v0.3.0/PieceOfCake.exe
+  InstallerSha256: DE655003E6A9D750DE7E557675A78011295D0778283DBC5A5F3ECCA603009627
 ManifestType: installer
 ManifestVersion: 1.6.0
