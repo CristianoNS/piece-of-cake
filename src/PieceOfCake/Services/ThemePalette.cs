@@ -8,13 +8,13 @@ internal static class ThemePalette
 {
     /// <summary>Tint laid over the system acrylic, measured against the real quick settings panel.</summary>
     public static Color AcrylicTint(bool light) =>
-        light ? Color.FromArgb(0xCC, 0xFC, 0xFC, 0xFC) : Color.FromArgb(0xCC, 0x1E, 0x1E, 0x1E);
+        light ? Color.FromArgb(0xCC, 0xFC, 0xFC, 0xFC) : Color.FromArgb(0xC2, 0x1E, 0x1E, 0x1E);
 
     /// <summary>Opaque background used when transparency effects are off in Windows.</summary>
     public static Color SolidBackground(bool light) =>
         light ? Color.FromRgb(0xF2, 0xF2, 0xF2) : Color.FromRgb(0x24, 0x24, 0x24);
 
-    public static void Apply(ResourceDictionary resources, bool light, Color accent)
+    public static void Apply(ResourceDictionary resources, bool light, Color accent, bool acrylic)
     {
         Set(resources, "AccentBrush", accent);
         Set(resources, "OnAccentBrush", light ? Color.FromRgb(0xFF, 0xFF, 0xFF) : Color.FromRgb(0x00, 0x00, 0x00));
@@ -30,11 +30,21 @@ internal static class ThemePalette
         Set(resources, "TileOffBrush", light ? Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x10, 0xFF, 0xFF, 0xFF));
         Set(resources, "TileOffBorderBrush", light ? Color.FromArgb(0x0F, 0, 0, 0) : Color.FromArgb(0x1F, 0xFF, 0xFF, 0xFF));
         Set(resources, "DividerBrush", light ? Color.FromArgb(0x10, 0, 0, 0) : Color.FromArgb(0x15, 0xFF, 0xFF, 0xFF));
-        Set(resources, "FooterBrush", light ? Color.FromArgb(0x06, 0, 0, 0) : Color.FromArgb(0x38, 0, 0, 0));
+        Set(resources, "FooterBrush", FooterColor(light, acrylic));
 
         Set(resources, "SliderTrackBrush", light ? Color.FromArgb(0x72, 0, 0, 0) : Color.FromArgb(0x8D, 0xFF, 0xFF, 0xFF));
         Set(resources, "SliderThumbRingBrush", light ? Color.FromRgb(0xFF, 0xFF, 0xFF) : Color.FromRgb(0x45, 0x45, 0x45));
     }
+
+    // The footer band is a lighter wash over acrylic than over the solid fallback background (measured on both).
+    private static Color FooterColor(bool light, bool acrylic) =>
+        (light, acrylic) switch
+        {
+            (true, true) => Color.FromArgb(0x06, 0, 0, 0),
+            (true, false) => Color.FromArgb(0x04, 0, 0, 0),
+            (false, true) => Color.FromArgb(0x16, 0, 0, 0),
+            (false, false) => Color.FromArgb(0x38, 0, 0, 0),
+        };
 
     private static void Set(ResourceDictionary resources, string key, Color color)
     {

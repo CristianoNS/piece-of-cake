@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -35,6 +36,8 @@ public partial class MainWindow : Window
 
     private SystemTheme _theme = new(false, true);
     private bool _backdropSupported;
+    private bool _appliedTransparency = true;
+    private bool _settingsChanged;
     private DateTime _lastHiddenUtc = DateTime.MinValue;
     private bool _opening;
 
@@ -77,11 +80,29 @@ public partial class MainWindow : Window
             }
         };
 
+        SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
         Closed += (_, _) =>
         {
+            SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
             _pairCts?.Cancel();
             _hue?.Dispose();
         };
+    }
+
+    /// <summary>
+    /// True when the Windows appearance settings changed after this window last looked at them. DWM keeps the old
+    /// backdrop state of an existing window (flat grey after transparency is switched back on), so the owner
+    /// should create a new window instead of reusing this one.
+    /// </summary>
+    public bool NeedsRecreate => _settingsChanged || SystemTheme.Read().TransparencyEnabled != _appliedTransparency;
+
+    private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+    {
+        if (e.Category is UserPreferenceCategory.General or UserPreferenceCategory.Color
+            or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.Window)
+        {
+            _settingsChanged = true;
+        }
     }
 
     /// <summary>Shows the flyout above the taskbar, or hides it when it is already visible.</summary>
@@ -410,7 +431,8 @@ public partial class MainWindow : Window
     private void ApplyTheme(SystemTheme theme)
     {
         _theme = theme;
-        ThemePalette.Apply(Application.Current.Resources, theme.IsLight, AccentColor.Read(theme.IsLight));
+        _appliedTransparency = theme.TransparencyEnabled;
+        ThemePalette.Apply(Application.Current.Resources, theme.IsLight, AccentColor.Read(theme.IsLight), UsesAcrylic);
 
         if (UsesAcrylic)
         {
