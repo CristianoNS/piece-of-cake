@@ -94,6 +94,17 @@
                                 </DataTemplate.Triggers>
                             </DataTemplate>
 
+                            <DataTemplate DataType="{x:Type vm:AppTileVm}">
+                                <StackPanel Margin="6,0" Height="96">
+                                    <Button Style="{StaticResource TileButton}" ToolTip="{Binding Target}"
+                                            Click="AppTile_Click">
+                                        <Image Source="{Binding Icon}" Width="28" Height="28"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Button>
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource TileLabel}"/>
+                                </StackPanel>
+                            </DataTemplate>
+
                             <DataTemplate DataType="{x:Type svc:ScriptEntry}">
                                 <StackPanel Margin="6,0" Height="96">
                                     <Button Style="{StaticResource TileButton}" Content="&#xE756;"

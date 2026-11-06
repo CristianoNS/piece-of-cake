@@ -10,6 +10,8 @@ procesora i pamięci oraz prędkość sieci, steruje światłami Philips Hue i u
 - **Statystyki systemu** w dolnym pasku: procesor, zajęta pamięć oraz prędkość pobierania i wysyłania.
 - **Światła Philips Hue:** pokoje i strefy jako kafelki. Kliknięcie ikony włącza lub gasi światło, strzałka obok
   otwiera listę scen, a suwak ustawia jasność.
+- **Skróty do programów:** kafelki z prawdziwymi ikonami (np. Chrome, Discord, Claude). Kliknięcie uruchamia
+  program i chowa panel.
 - **Własne skrypty:** każdy wpisany przez Ciebie skrypt jest kafelkiem w panelu.
 - **Paszport komputera:** zapisuje opis sprzętu i systemu w pliku Markdown.
 - **Autostart:** przełącznik uruchamiania razem z Windows.
@@ -71,6 +73,24 @@ Adres IP mostka znajdziesz w aplikacji Hue: Ustawienia → Mostki Hue → (i).
 - „Wykryj" pyta usługę `discovery.meethue.com` (chmura Philips). Jeśli wolisz tego uniknąć, wpisz IP ręcznie.
 - Klucz dostępu jest zapisany zaszyfrowany (DPAPI, tylko dla Twojego konta Windows).
 - Certyfikat mostka jest zapamiętany przy pierwszym połączeniu. Jeśli się zmieni, panel poprosi o ponowne parowanie.
+
+## Skróty do programów
+
+Plik ustawień: `%APPDATA%\PieceOfCake\settings.json` (przycisk z zębatką w panelu otwiera ten folder).
+Dodaj wpisy do listy `Apps`, np.:
+
+```json
+"Apps": [
+  { "Name": "Chrome", "Target": "shell:AppsFolder\\Chrome" },
+  { "Name": "Discord", "Target": "shell:AppsFolder\\com.squirrel.Discord.Discord" },
+  { "Name": "Claude", "Target": "shell:AppsFolder\\Claude_pzs8sxrjxfjjc!Claude" }
+]
+```
+
+`Target` to identyfikator programu z menu Start w postaci `shell:AppsFolder\<AppId>` (działa także dla aplikacji
+ze Sklepu), ścieżka do pliku lub folderu albo adres internetowy. Identyfikatory zainstalowanych programów wypiszesz
+w PowerShellu poleceniem `Get-StartApps`. Ikony pobiera system, więc kafelki wyglądają tak samo jak w menu Start.
+Zmiany w pliku są widoczne po ponownym uruchomieniu aplikacji.
 
 ## Własne skrypty
 

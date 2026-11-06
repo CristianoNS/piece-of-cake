@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using System.Windows;
@@ -56,6 +57,7 @@ public partial class MainWindow : Window
         TilesControl.ItemsSource = new CompositeCollection
         {
             new CollectionContainer { Collection = _rooms },
+            new CollectionContainer { Collection = _settings.Current.Apps.Select(a => new AppTileVm(a)).ToList() },
             new CollectionContainer { Collection = _settings.Current.Scripts },
             new CollectionContainer { Collection = new[] { _refreshTile, _passportTile, _autostartTile } },
         };
@@ -337,6 +339,27 @@ public partial class MainWindow : Window
         {
             const double gigabyte = 1024.0 * 1024.0 * 1024.0;
             RamText.Text = $"{used / gigabyte:0.0} GB";
+        }
+    }
+
+    // ---------- Apps ----------
+
+    private void AppTile_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is not AppTileVm app)
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(app.Target) { UseShellExecute = true });
+            HideFlyout();
+        }
+        catch (Exception ex) when (ex is Win32Exception or InvalidOperationException or IOException)
+        {
+            Logger.Log(ex);
+            ShowFooterStatus($"Nie udało się uruchomić „{app.Name}”: {ex.Message}");
         }
     }
 
