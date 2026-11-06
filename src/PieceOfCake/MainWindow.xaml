@@ -202,16 +202,15 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock FontSize="12">
-                            <Run Text="Procesor"/>
-                            <Run x:Name="CpuText" Text="0%" Foreground="{StaticResource SubTextBrush}"/>
-                            <Run Text="  ·  Pamięć"/>
-                            <Run x:Name="RamText" Text="-" Foreground="{StaticResource SubTextBrush}"/>
-                        </TextBlock>
-                        <TextBlock x:Name="NetText" FontSize="12" Text="–" Foreground="{StaticResource SubTextBrush}"
-                                   Margin="0,2,0,0"/>
-                    </StackPanel>
+                    <TextBlock FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                        <Run Text="&#xE950;" FontFamily="{StaticResource IconFont}" FontSize="14" ToolTip="Procesor"/>
+                        <Run x:Name="CpuText" Text="0%"/>
+                        <Run Text="   "/>
+                        <Run Text="&#xE964;" FontFamily="{StaticResource IconFont}" FontSize="14"/>
+                        <Run x:Name="RamText" Text="-"/>
+                        <Run Text="   "/>
+                        <Run x:Name="NetText" Text="–"/>
+                    </TextBlock>
                     <Button x:Name="SettingsFolderButton" Grid.Column="1" Style="{StaticResource IconButton}"
                             Content="&#xE713;" ToolTip="Otwórz folder ustawień (tu dodasz własne skrypty)"
                             Click="SettingsFolderButton_Click"/>
