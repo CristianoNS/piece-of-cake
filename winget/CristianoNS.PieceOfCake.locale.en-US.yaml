@@ -1,0 +1,16 @@
+PackageIdentifier: CristianoNS.PieceOfCake
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: CristianoNS
+PackageName: Piece of Cake
+PackageUrl: https://github.com/CristianoNS/piece-of-cake
+License: MIT
+LicenseUrl: https://github.com/CristianoNS/piece-of-cake/blob/main/LICENSE
+ShortDescription: Custom flyout panel in the style of Windows 11 quick settings (CPU, RAM, network, Philips Hue, scripts).
+Tags:
+- tray
+- flyout
+- philips-hue
+- windows-11
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
