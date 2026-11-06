@@ -12,9 +12,9 @@
         <SolidColorBrush x:Key="TrackBrush" Color="#33FFFFFF"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#FF60CDFF"/>
         <SolidColorBrush x:Key="OnAccentBrush" Color="#FF000000"/>
-        <SolidColorBrush x:Key="TileOffBrush" Color="#FF3B3B3B"/>
-        <SolidColorBrush x:Key="TileOffBorderBrush" Color="#FF4A4A4A"/>
-        <SolidColorBrush x:Key="DividerBrush" Color="#FF3A3A3A"/>
+        <SolidColorBrush x:Key="TileOffBrush" Color="#12FFFFFF"/>
+        <SolidColorBrush x:Key="TileOffBorderBrush" Color="#1AFFFFFF"/>
+        <SolidColorBrush x:Key="DividerBrush" Color="#1AFFFFFF"/>
         <SolidColorBrush x:Key="FooterBrush" Color="#66000000"/>
         <SolidColorBrush x:Key="SliderTrackBrush" Color="#FF9A9A9A"/>
         <SolidColorBrush x:Key="SliderThumbRingBrush" Color="#FF454545"/>
@@ -147,6 +147,18 @@
             </Setter>
         </Style>
 
+
+        <Style x:Key="FooterIcon" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="FooterValue" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource SubTextBrush}"/>
+        </Style>
 
         <Style x:Key="TileLabel" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>

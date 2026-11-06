@@ -120,6 +120,7 @@
 
                     <!-- Jasność wybranego pokoju -->
                     <StackPanel x:Name="HomeBrightnessPanel" Visibility="Collapsed" Margin="0,4,0,8">
+                        <Rectangle Height="1" Fill="{StaticResource DividerBrush}" Margin="-20,0,-20,14"/>
                         <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{StaticResource SubTextBrush}"
                                    Margin="34,0,0,0" TextTrimming="CharacterEllipsis"/>
                         <Grid>
@@ -202,15 +203,18 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
-                        <Run Text="&#xE950;" FontFamily="{StaticResource IconFont}" FontSize="14" ToolTip="Procesor"/>
-                        <Run x:Name="CpuText" Text="0%"/>
-                        <Run Text="   "/>
-                        <Run Text="&#xE964;" FontFamily="{StaticResource IconFont}" FontSize="14"/>
-                        <Run x:Name="RamText" Text="-"/>
-                        <Run Text="   "/>
-                        <Run x:Name="NetText" Text="–"/>
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" TextBlock.FontSize="12">
+                        <TextBlock Style="{StaticResource FooterIcon}" Text="&#xE950;" ToolTip="Procesor"/>
+                        <TextBlock x:Name="CpuText" Style="{StaticResource FooterValue}" Text="0%"/>
+                        <TextBlock Style="{StaticResource FooterIcon}" Text="&#xE964;" Margin="14,0,6,0" ToolTip="Pamięć"/>
+                        <TextBlock x:Name="RamText" Style="{StaticResource FooterValue}" Text="-"/>
+                        <TextBlock x:Name="NetDownIcon" Style="{StaticResource FooterIcon}" Text="&#xE896;" Margin="14,0,4,0"
+                                   ToolTip="Pobieranie"/>
+                        <TextBlock x:Name="NetText" Style="{StaticResource FooterValue}" Text="–"/>
+                        <TextBlock x:Name="NetUpIcon" Style="{StaticResource FooterIcon}" Text="&#xE898;" Margin="10,0,4,0"
+                                   ToolTip="Wysyłanie"/>
+                        <TextBlock x:Name="NetUpText" Style="{StaticResource FooterValue}" Text="–"/>
+                    </StackPanel>
                     <Button x:Name="SettingsFolderButton" Grid.Column="1" Style="{StaticResource IconButton}"
                             Content="&#xE713;" ToolTip="Otwórz folder ustawień (tu dodasz własne skrypty)"
                             Click="SettingsFolderButton_Click"/>

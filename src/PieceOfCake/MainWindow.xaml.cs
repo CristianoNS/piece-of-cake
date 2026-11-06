@@ -120,15 +120,37 @@ public partial class MainWindow : Window
 
         if (WindowEffects.ApplyFlyoutLook(this))
         {
+            // The system acrylic behind the window is fairly light, so a dark tint (measured against the real quick
+            // settings panel) brings it to the same brightness and keeps the wallpaper faintly visible.
             Background = Brushes.Transparent;
-            RootBorder.Background = new SolidColorBrush(Color.FromArgb(0xB8, 0x20, 0x20, 0x20));
+            RootBorder.Background = new SolidColorBrush(Color.FromArgb(0xA8, 0x20, 0x20, 0x20));
+        }
+    }
+
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        // The acrylic backdrop only renders for an active window; set it again once activation has happened.
+        if (IsVisible)
+        {
+            WindowEffects.RefreshBackdrop(this);
         }
     }
 
     protected override void OnDeactivated(EventArgs e)
     {
         base.OnDeactivated(e);
-        HideFlyout();
+
+        // Hiding inside the deactivation notification leaves the DWM acrylic backdrop in a broken state (the next
+        // opening is flat grey), so let the notification finish first.
+        _ = Dispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
+        {
+            if (!IsActive)
+            {
+                HideFlyout();
+            }
+        });
     }
 
     private void ShowFlyout()
@@ -141,6 +163,7 @@ public partial class MainWindow : Window
         RootBorder.Opacity = 0;
         Left = -32000;
         Show();
+        WindowEffects.RefreshBackdrop(this);
         UpdateLayout();
         PositionWindow();
         PlayOpenAnimation();
@@ -161,6 +184,8 @@ public partial class MainWindow : Window
         // The adapter list is read once per opening; the timer then only reads two counters per adapter.
         _network.Refresh();
         NetText.Text = "–";
+        NetUpText.Text = "–";
+        NetUpIcon.Visibility = Visibility.Visible;
         _metricsTimer.Start();
     }
 
@@ -245,9 +270,10 @@ public partial class MainWindow : Window
 
     private void UpdateNetwork()
     {
-        NetText.Text = _network.TrySample(out var download, out var upload)
-            ? $"↓ {NetworkMeter.FormatSpeed(download)}   ↑ {NetworkMeter.FormatSpeed(upload)}"
-            : "brak połączenia";
+        var connected = _network.TrySample(out var download, out var upload);
+        NetText.Text = connected ? NetworkMeter.FormatSpeed(download) : "brak połączenia";
+        NetUpText.Text = connected ? NetworkMeter.FormatSpeed(upload) : "";
+        NetUpIcon.Visibility = connected ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void UpdateMetrics()
