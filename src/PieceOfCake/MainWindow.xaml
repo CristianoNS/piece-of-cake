@@ -12,7 +12,7 @@
         ShowActivated="True"
         Topmost="True"
         Background="#FF202020"
-        Foreground="{StaticResource TextBrush}"
+        Foreground="{DynamicResource TextBrush}"
         FontFamily="Segoe UI Variable Text, Segoe UI"
         FontSize="13"
         UseLayoutRounding="True"
@@ -32,7 +32,7 @@
                 <StackPanel Margin="24,24,24,0">
 
                     <StackPanel x:Name="HuePairPanel" Visibility="Collapsed" Margin="0,0,0,16">
-                        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,8"
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource SubTextBrush}" Margin="0,0,0,8"
                                    Text="Podaj adres IP mostka Hue, kliknij „Połącz” i w ciągu 30 sekund naciśnij okrągły przycisk na mostku."/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -50,7 +50,7 @@
                         </Grid>
                     </StackPanel>
                     <TextBlock x:Name="HueStatusText" Visibility="Collapsed" TextWrapping="Wrap"
-                               Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,16"/>
+                               Foreground="{DynamicResource SubTextBrush}" Margin="0,0,0,16"/>
 
                     <!-- Kafelki: pokoje Hue, własne skrypty, akcje -->
                     <ItemsControl x:Name="TilesControl" Margin="-6,0,-6,-2" Focusable="False">
@@ -64,8 +64,8 @@
                             <DataTemplate DataType="{x:Type vm:HueRoomVm}">
                                 <StackPanel Margin="6,0" Height="96">
                                     <Border x:Name="Tile" Height="48" CornerRadius="4" BorderThickness="1"
-                                            Background="{StaticResource TileOffBrush}"
-                                            BorderBrush="{StaticResource TileOffBorderBrush}">
+                                            Background="{DynamicResource TileOffBrush}"
+                                            BorderBrush="{DynamicResource TileOffBorderBrush}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
@@ -73,11 +73,11 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <Button x:Name="Face" Style="{StaticResource TileFaceLeft}" Content="&#xE82F;"
-                                                    Foreground="{StaticResource TextBrush}" Click="RoomToggle_Click"
+                                                    Foreground="{DynamicResource TextBrush}" Click="RoomToggle_Click"
                                                     ToolTip="Włącz lub wyłącz"/>
-                                            <Rectangle x:Name="Divider" Grid.Column="1" Fill="{StaticResource TileOffBorderBrush}"/>
+                                            <Rectangle x:Name="Divider" Grid.Column="1" Fill="{DynamicResource TileOffBorderBrush}"/>
                                             <Button x:Name="More" Grid.Column="2" Style="{StaticResource TileFaceRight}"
-                                                    Content="&#xE76C;" Foreground="{StaticResource TextBrush}"
+                                                    Content="&#xE76C;" Foreground="{DynamicResource TextBrush}"
                                                     Click="RoomMore_Click" ToolTip="Sceny"/>
                                         </Grid>
                                     </Border>
@@ -88,8 +88,8 @@
                                         <Setter TargetName="Tile" Property="Background" Value="{DynamicResource AccentBrush}"/>
                                         <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                         <Setter TargetName="Divider" Property="Fill" Value="#33000000"/>
-                                        <Setter TargetName="Face" Property="Foreground" Value="{StaticResource OnAccentBrush}"/>
-                                        <Setter TargetName="More" Property="Foreground" Value="{StaticResource OnAccentBrush}"/>
+                                        <Setter TargetName="Face" Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
+                                        <Setter TargetName="More" Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
@@ -112,7 +112,7 @@
                                     <DataTrigger Binding="{Binding IsOn}" Value="True">
                                         <Setter TargetName="Tile" Property="Background" Value="{DynamicResource AccentBrush}"/>
                                         <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-                                        <Setter TargetName="Tile" Property="Foreground" Value="{StaticResource OnAccentBrush}"/>
+                                        <Setter TargetName="Tile" Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
@@ -122,8 +122,8 @@
 
                     <!-- Jasność wybranego pokoju -->
                     <StackPanel x:Name="HomeBrightnessPanel" Visibility="Collapsed">
-                        <Rectangle Height="1" Fill="{StaticResource DividerBrush}" Margin="-24,0"/>
-                        <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{StaticResource SubTextBrush}"
+                        <Rectangle Height="1" Fill="{DynamicResource DividerBrush}" Margin="-24,0"/>
+                        <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{DynamicResource SubTextBrush}"
                                    Margin="33,6,0,0" Height="16" TextTrimming="CharacterEllipsis"/>
                         <Grid Height="32" Margin="0,0,0,18">
                             <Grid.ColumnDefinitions>
@@ -139,7 +139,7 @@
                     </StackPanel>
 
                     <TextBlock x:Name="FooterStatus" Visibility="Collapsed" TextWrapping="Wrap" Margin="0,0,0,12"
-                               Foreground="{StaticResource SubTextBrush}"/>
+                               Foreground="{DynamicResource SubTextBrush}"/>
                 </StackPanel>
             </ScrollViewer>
 
@@ -161,7 +161,7 @@
                             ToolTip="Wróć" Click="ScenesBackButton_Click"/>
                     <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
                                VerticalAlignment="Center" Margin="8,0" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource SubTextBrush}"
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{DynamicResource SubTextBrush}"
                                Text="Wyłączone">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -200,8 +200,8 @@
             </Grid>
 
             <!-- Pasek dolny: statystyki systemu i ustawienia -->
-            <Border Grid.Row="1" Height="48" Background="{StaticResource FooterBrush}"
-                    BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,1,0,0" Padding="24,0">
+            <Border Grid.Row="1" Height="48" Background="{DynamicResource FooterBrush}"
+                    BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="24,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

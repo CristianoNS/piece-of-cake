@@ -13,18 +13,35 @@ internal static class WindowEffects
     /// Asks DWM for the acrylic backdrop again. After the window has been hidden DWM can drop the backdrop,
     /// and the next opening then shows a flat grey panel until the attribute is set once more.
     /// </summary>
-    public static void RefreshBackdrop(Window window)
+    public static void RefreshBackdrop(Window window, bool dark, bool transparency)
     {
         var hwnd = new WindowInteropHelper(window).Handle;
-        if (hwnd == IntPtr.Zero || Environment.OSVersion.Version.Build < MinBuildForBackdrop)
+        if (hwnd == IntPtr.Zero)
         {
             return;
         }
 
         try
         {
+            var darkValue = dark ? 1 : 0;
+            _ = NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaUseImmersiveDarkMode, ref darkValue, sizeof(int));
+
+            if (Environment.OSVersion.Version.Build < MinBuildForBackdrop)
+            {
+                return;
+            }
+
             var none = NativeMethods.DwmsbtNone;
             _ = NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaSystemBackdropType, ref none, sizeof(int));
+
+            if (!transparency)
+            {
+                // Transparency effects are off in Windows: no backdrop, the window paints a solid colour itself.
+                var noMargins = default(NativeMethods.Margins);
+                _ = NativeMethods.DwmExtendFrameIntoClientArea(hwnd, ref noMargins);
+                return;
+            }
+
             var backdrop = NativeMethods.DwmsbtTransientWindow;
             _ = NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaSystemBackdropType, ref backdrop, sizeof(int));
 
@@ -64,9 +81,6 @@ internal static class WindowEffects
         {
             var exStyle = NativeMethods.GetWindowLong(hwnd, NativeMethods.GwlExStyle);
             _ = NativeMethods.SetWindowLong(hwnd, NativeMethods.GwlExStyle, exStyle | NativeMethods.WsExToolWindow);
-
-            var dark = 1;
-            _ = NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DwmwaUseImmersiveDarkMode, ref dark, sizeof(int));
 
             if (Environment.OSVersion.Version.Build < MinBuildForBackdrop)
             {

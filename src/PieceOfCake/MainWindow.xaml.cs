@@ -33,6 +33,8 @@ public partial class MainWindow : Window
     private readonly ActionTileVm _passportTile;
     private readonly ActionTileVm _autostartTile;
 
+    private SystemTheme _theme = new(false, true);
+    private bool _backdropSupported;
     private DateTime _lastHiddenUtc = DateTime.MinValue;
     private bool _opening;
 
@@ -118,13 +120,8 @@ public partial class MainWindow : Window
     {
         base.OnSourceInitialized(e);
 
-        if (WindowEffects.ApplyFlyoutLook(this))
-        {
-            // The system acrylic behind the window is fairly light, so a dark tint (measured against the real quick
-            // settings panel) brings it to the same brightness and keeps the wallpaper faintly visible.
-            Background = Brushes.Transparent;
-            RootBorder.Background = new SolidColorBrush(Color.FromArgb(0xA8, 0x20, 0x20, 0x20));
-        }
+        _backdropSupported = WindowEffects.ApplyFlyoutLook(this);
+        ApplyTheme(SystemTheme.Read());
     }
 
     protected override void OnActivated(EventArgs e)
@@ -134,7 +131,7 @@ public partial class MainWindow : Window
         // The acrylic backdrop only renders for an active window; set it again once activation has happened.
         if (IsVisible)
         {
-            WindowEffects.RefreshBackdrop(this);
+            WindowEffects.RefreshBackdrop(this, !_theme.IsLight, UsesAcrylic);
         }
     }
 
@@ -156,14 +153,14 @@ public partial class MainWindow : Window
     private void ShowFlyout()
     {
         _autostartTile.IsOn = StartupManager.IsEnabled();
-        ApplyAccentColor();
+        ApplyTheme(SystemTheme.Read());
         ShowHomePage();
 
         // Keep the first frame invisible and off screen until the layout is known, so nothing flashes.
         RootBorder.Opacity = 0;
         Left = -32000;
         Show();
-        WindowEffects.RefreshBackdrop(this);
+        WindowEffects.RefreshBackdrop(this, !_theme.IsLight, UsesAcrylic);
         UpdateLayout();
         PositionWindow();
         PlayOpenAnimation();
@@ -404,13 +401,27 @@ public partial class MainWindow : Window
 
     private void ScenesBackButton_Click(object sender, RoutedEventArgs e) => ShowHomePage();
 
-    private static void ApplyAccentColor()
+    private bool UsesAcrylic => _backdropSupported && _theme.TransparencyEnabled;
+
+    /// <summary>
+    /// Follows the Windows settings (read only): light or dark system mode, transparency effects on or off and the
+    /// accent colour. With transparency off the panel is solid, like the system flyouts.
+    /// </summary>
+    private void ApplyTheme(SystemTheme theme)
     {
-        // Styles freeze the brush they use, so it is replaced instead of changed; every use is a DynamicResource.
-        var color = AccentColor.Read();
-        if (Application.Current.Resources["AccentBrush"] is not SolidColorBrush current || current.Color != color)
+        _theme = theme;
+        ThemePalette.Apply(Application.Current.Resources, theme.IsLight, AccentColor.Read(theme.IsLight));
+
+        if (UsesAcrylic)
         {
-            Application.Current.Resources["AccentBrush"] = new SolidColorBrush(color);
+            Background = Brushes.Transparent;
+            RootBorder.Background = new SolidColorBrush(ThemePalette.AcrylicTint(theme.IsLight));
+        }
+        else
+        {
+            var solid = new SolidColorBrush(ThemePalette.SolidBackground(theme.IsLight));
+            Background = solid;
+            RootBorder.Background = solid;
         }
     }
 
