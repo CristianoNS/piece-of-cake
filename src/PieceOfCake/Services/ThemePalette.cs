@@ -12,7 +12,7 @@ internal static class ThemePalette
 
     /// <summary>Opaque background used when transparency effects are off in Windows.</summary>
     public static Color SolidBackground(bool light) =>
-        light ? Color.FromRgb(0xF3, 0xF3, 0xF3) : Color.FromRgb(0x2B, 0x2B, 0x2B);
+        light ? Color.FromRgb(0xF2, 0xF2, 0xF2) : Color.FromRgb(0x2B, 0x2B, 0x2B);
 
     public static void Apply(ResourceDictionary resources, bool light, Color accent)
     {
