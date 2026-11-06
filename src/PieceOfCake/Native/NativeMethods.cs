@@ -69,6 +69,18 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
 
+    public const uint SwpNoSize = 0x0001;
+    public const uint SwpNoMove = 0x0002;
+    public const uint SwpNoZOrder = 0x0004;
+    public const uint SwpNoActivate = 0x0010;
+    public const uint SwpAsyncWindowPos = 0x4000;
+
+    [DllImport("dwmapi.dll")]
+    public static extern int DwmFlush();
+
+    [DllImport("user32.dll", EntryPoint = "FindWindowW", CharSet = CharSet.Unicode)]
+    public static extern IntPtr FindWindow(string className, string? windowName);
+
     public const uint WmNcActivate = 0x0086;
     public const uint SwpFrameChangedFlags = 0x0001 | 0x0002 | 0x0004 | 0x0010 | 0x0020; // NOSIZE|NOMOVE|NOZORDER|NOACTIVATE|FRAMECHANGED
 
