@@ -1,41 +1,73 @@
 # Piece of Cake
 
-Własny wysuwany panel w stylu szybkich ustawień Windows 11 (ikona przy zegarze).
+Mały panel w stylu szybkich ustawień Windows 11. Ikona przy zegarze wysuwa go spod paska zadań: pokazuje zużycie
+procesora i pamięci oraz prędkość sieci, steruje światłami Philips Hue i uruchamia Twoje skrypty jednym kliknięciem.
 
-Zawiera: CPU, RAM i prędkość sieci, światła Philips Hue (pokoje, strefy, sceny),
-własne skrypty, „Paszport komputera" i przełącznik autostartu.
+![Panel Piece of Cake](docs/screenshot.png)
 
-## Uruchomienie
+## Co potrafi
 
-- Gotowy plik `publish\PieceOfCake.exe` (jeden samodzielny plik z wbudowanym .NET, ok. 148 MB na dysku, nie wymaga
-  instalowania .NET). Uruchom go, a w zasobniku pojawi się ikona. Kliknięcie ikony otwiera i zamyka panel,
-  `Esc` także go zamyka.
-- Z kodu: zainstaluj .NET 10 SDK i uruchom `build.bat` (wynik w folderze `publish`). Testy: `dotnet test PieceOfCake.sln`.
+- **Statystyki systemu** w dolnym pasku: procesor, zajęta pamięć oraz prędkość pobierania i wysyłania.
+- **Światła Philips Hue:** pokoje i strefy jako kafelki. Kliknięcie ikony włącza lub gasi światło, strzałka obok
+  otwiera listę scen, a suwak ustawia jasność.
+- **Własne skrypty:** każdy wpisany przez Ciebie skrypt jest kafelkiem w panelu.
+- **Paszport komputera:** zapisuje opis sprzętu i systemu w pliku Markdown.
+- **Autostart:** przełącznik uruchamiania razem z Windows.
 
-## Instalator (opcjonalnie)
+## Wygląd
 
-Zamiast uruchamiać samego `.exe` możesz zbudować zwykły instalator (menu Start, opcjonalny skrót na pulpicie,
-pole „Uruchamiaj z systemem", odinstalowanie z Ustawienia → Aplikacje).
+Panel wygląda i porusza się jak natywne okna Windows 11 i dostosowuje się do Twoich ustawień:
 
-1. Zainstaluj darmowy [Inno Setup 6](https://jrsoftware.org/isdl.php) (wersja 6.3 lub nowsza).
-2. Upewnij się, że istnieje folder `publish` z `PieceOfCake.exe` (gotowy folder skopiuj obok `installer`
-   albo uruchom `build.bat`, który go zbuduje).
-3. Uruchom `installer\build-installer.bat`. Wynik: `installer-output\PieceOfCake-Setup.exe`.
-   Można też otworzyć `installer\PieceOfCake.iss` w Inno Setup i nacisnąć Ctrl+F9.
+- jasny i ciemny motyw systemu,
+- efekty przezroczystości (włączone: akryl systemowy, wyłączone: jednolite tło),
+- kolor akcentu z ustawień Windows,
+- efekty animacji (wysuwanie i chowanie spod paska zadań).
 
-Instalator domyślnie instaluje program tylko dla Twojego konta (bez praw administratora). W oknie
-wyboru można zmienić to na instalację dla wszystkich użytkowników. Przy odinstalowaniu pyta, czy usunąć
-też ustawienia i sparowanie z mostkiem Hue.
+Aplikacja jest przeznaczona dla Windows 11 (akryl systemowy wymaga wersji 22H2 lub nowszej).
+
+## Instalacja przez winget
+
+Aplikację instalujesz za pomocą [winget](https://learn.microsoft.com/windows/package-manager/winget/) z manifestu z
+tego repozytorium (folder `winget`). Instalacja nie wymaga uprawnień administratora, ale jednorazowo trzeba włączyć
+instalowanie z lokalnych manifestów.
+
+1. Pobierz repozytorium:
+
+   ```powershell
+   git clone https://github.com/CristianoNS/piece-of-cake.git
+   cd piece-of-cake
+   ```
+
+2. Raz, w terminalu uruchomionym jako administrator, włącz lokalne manifesty:
+
+   ```powershell
+   winget settings --enable LocalManifestFiles
+   ```
+
+3. Zainstaluj aplikację:
+
+   ```powershell
+   winget install --manifest .\winget
+   ```
+
+4. Uruchom ją poleceniem `PieceOfCake`. W zasobniku pojawi się ikona, a kliknięcie jej otwiera i zamyka panel
+   (`Esc` także go zamyka).
+
+Aplikacja jest jednym samodzielnym plikiem z wbudowanym .NET (nie trzeba instalować .NET). Odinstalujesz ją
+poleceniem:
+
+```powershell
+winget uninstall CristianoNS.PieceOfCake
+```
 
 ## Pierwsze połączenie z Hue
 
-1. Otwórz panel i w sekcji „Światła Hue" wpisz adres IP mostka (albo kliknij „Wykryj").
+1. Otwórz panel i wpisz adres IP mostka (albo kliknij „Wykryj").
 2. Kliknij „Połącz" i w ciągu 30 sekund naciśnij okrągły przycisk na mostku.
 3. Pokoje i strefy pojawią się w panelu razem ze scenami z aplikacji Hue.
 
 Adres IP mostka znajdziesz w aplikacji Hue: Ustawienia → Mostki Hue → (i).
 
-Uwagi:
 - „Wykryj" pyta usługę `discovery.meethue.com` (chmura Philips). Jeśli wolisz tego uniknąć, wpisz IP ręcznie.
 - Klucz dostępu jest zapisany zaszyfrowany (DPAPI, tylko dla Twojego konta Windows).
 - Certyfikat mostka jest zapamiętany przy pierwszym połączeniu. Jeśli się zmieni, panel poprosi o ponowne parowanie.
@@ -52,18 +84,12 @@ Dodaj wpisy do listy `Scripts`, np.:
 ]
 ```
 
-Każdy wpis staje się przyciskiem w panelu. Uruchamiane są tylko pliki, które sam wpiszesz.
+Każdy wpis staje się kafelkiem w panelu. Uruchamiane są tylko pliki, które sam wpiszesz.
 
 ## Paszport komputera
 
 Zapisuje plik Markdown w `Dokumenty\PieceOfCake` (system, procesor, RAM, dyski, sieć, zainstalowane programy)
 i pokazuje go w Eksploratorze.
-
-## Ikony
-
-Ikona aplikacji (menu Start, skrót, instalator) jest różowa, a ikona w zasobniku jest biała na ciemnym
-pasku zadań i ciemna na jasnym (przełącza się sama razem z motywem Windows). Pliki są w folderze `Assets`.
-Kształt pochodzi z Lucide (licencja ISC), szczegóły w `THIRD_PARTY_NOTICES.md`.
 
 ## Pliki i logi
 
