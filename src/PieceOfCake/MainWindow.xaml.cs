@@ -406,10 +406,11 @@ public partial class MainWindow : Window
 
     private static void ApplyAccentColor()
     {
-        // The brush lives in App.xaml and is shared by every style, so changing its colour restyles the panel.
-        if (Application.Current.Resources["AccentBrush"] is SolidColorBrush { IsFrozen: false } brush)
+        // Styles freeze the brush they use, so it is replaced instead of changed; every use is a DynamicResource.
+        var color = AccentColor.Read();
+        if (Application.Current.Resources["AccentBrush"] is not SolidColorBrush current || current.Color != color)
         {
-            brush.Color = AccentColor.Read();
+            Application.Current.Resources["AccentBrush"] = new SolidColorBrush(color);
         }
     }
 
