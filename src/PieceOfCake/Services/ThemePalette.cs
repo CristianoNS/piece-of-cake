@@ -8,7 +8,7 @@ internal static class ThemePalette
 {
     /// <summary>Tint laid over the system acrylic, measured against the real quick settings panel.</summary>
     public static Color AcrylicTint(bool light) =>
-        light ? Color.FromArgb(0xD0, 0xF3, 0xF3, 0xF3) : Color.FromArgb(0xCC, 0x1E, 0x1E, 0x1E);
+        light ? Color.FromArgb(0xCC, 0xFC, 0xFC, 0xFC) : Color.FromArgb(0xCC, 0x1E, 0x1E, 0x1E);
 
     /// <summary>Opaque background used when transparency effects are off in Windows.</summary>
     public static Color SolidBackground(bool light) =>
@@ -29,8 +29,8 @@ internal static class ThemePalette
 
         Set(resources, "TileOffBrush", light ? Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x12, 0xFF, 0xFF, 0xFF));
         Set(resources, "TileOffBorderBrush", light ? Color.FromArgb(0x0F, 0, 0, 0) : Color.FromArgb(0x1F, 0xFF, 0xFF, 0xFF));
-        Set(resources, "DividerBrush", light ? Color.FromArgb(0x14, 0, 0, 0) : Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF));
-        Set(resources, "FooterBrush", light ? Color.FromArgb(0x0D, 0, 0, 0) : Color.FromArgb(0x66, 0, 0, 0));
+        Set(resources, "DividerBrush", light ? Color.FromArgb(0x10, 0, 0, 0) : Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF));
+        Set(resources, "FooterBrush", light ? Color.FromArgb(0x06, 0, 0, 0) : Color.FromArgb(0x66, 0, 0, 0));
 
         Set(resources, "SliderTrackBrush", light ? Color.FromArgb(0x72, 0, 0, 0) : Color.FromArgb(0x9E, 0xFF, 0xFF, 0xFF));
         Set(resources, "SliderThumbRingBrush", light ? Color.FromRgb(0xFF, 0xFF, 0xFF) : Color.FromRgb(0x45, 0x45, 0x45));
