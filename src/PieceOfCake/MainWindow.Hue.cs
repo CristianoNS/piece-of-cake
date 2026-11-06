@@ -22,6 +22,7 @@ public partial class MainWindow
     private HueClient? _hue;
     private CancellationTokenSource? _pairCts;
     private bool _hueBusy;
+    private string? _selectedRoomId;
 
     private async Task RefreshHueAsync()
     {
@@ -43,7 +44,6 @@ public partial class MainWindow
             var rooms = await _hue.GetRoomsAsync();
             ApplyRooms(rooms);
             HuePairPanel.Visibility = Visibility.Collapsed;
-            HueRoomsControl.Visibility = Visibility.Visible;
             SetHueStatus(rooms.Count == 0 ? "W mostku nie ma żadnych pokoi ani stref." : null);
         }
         catch (HueException ex) when (ex.Unauthorized)
@@ -85,7 +85,7 @@ public partial class MainWindow
     private void ShowHuePairing(string? message)
     {
         _rooms.Clear();
-        HueRoomsControl.Visibility = Visibility.Collapsed;
+        UpdateSelectedRoom();
         HuePairPanel.Visibility = Visibility.Visible;
         if (string.IsNullOrWhiteSpace(BridgeIpBox.Text))
         {
@@ -113,6 +113,7 @@ public partial class MainWindow
                 _rooms[i].SetState(rooms[i].IsOn, rooms[i].Brightness);
             }
 
+            UpdateSelectedRoom();
             return;
         }
 
@@ -129,6 +130,42 @@ public partial class MainWindow
             room.PowerChanged += OnRoomPowerChanged;
             room.BrightnessCommitted += OnRoomBrightnessCommitted;
             _rooms.Add(room);
+        }
+
+        UpdateSelectedRoom();
+    }
+
+    /// <summary>Keeps the brightness slider on the home screen pointed at a room that still exists.</summary>
+    private void UpdateSelectedRoom()
+    {
+        var room = _rooms.FirstOrDefault(r => string.Equals(r.Id, _selectedRoomId, StringComparison.Ordinal))
+                   ?? _rooms.FirstOrDefault(r => r.IsOn)
+                   ?? _rooms.FirstOrDefault();
+        SelectRoom(room);
+    }
+
+    private void SelectRoom(HueRoomVm? room)
+    {
+        _selectedRoomId = room?.Id;
+        HomeBrightnessPanel.DataContext = room;
+        HomeBrightnessPanel.Visibility = room == null ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void RoomToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is HueRoomVm room)
+        {
+            room.IsOn = !room.IsOn;
+            SelectRoom(room);
+        }
+    }
+
+    private void RoomMore_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is HueRoomVm room)
+        {
+            SelectRoom(room);
+            ShowScenesPage(room);
         }
     }
 
@@ -188,11 +225,6 @@ public partial class MainWindow
         {
             SetHueStatus(ex.Message);
         }
-    }
-
-    private async void HueRefreshButton_Click(object sender, RoutedEventArgs e)
-    {
-        await RefreshHueAsync();
     }
 
     private async void DetectBridgeButton_Click(object sender, RoutedEventArgs e)

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using PieceOfCake.Native;
 using PieceOfCake.Services;
+using PieceOfCake.ViewModels;
 
 namespace PieceOfCake;
 
@@ -27,6 +29,10 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _metricsTimer;
     private readonly DispatcherTimer _statusTimer;
 
+    private readonly ActionTileVm _refreshTile;
+    private readonly ActionTileVm _passportTile;
+    private readonly ActionTileVm _autostartTile;
+
     private DateTime _lastHiddenUtc = DateTime.MinValue;
     private bool _opening;
 
@@ -37,9 +43,15 @@ public partial class MainWindow : Window
 
         MaxHeight = Math.Max(300, SystemParameters.WorkArea.Height - 2 * ScreenMargin);
 
-        ScriptsControl.ItemsSource = _settings.Current.Scripts;
-        ScriptsHint.Visibility = _settings.Current.Scripts.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        HueRoomsControl.ItemsSource = _rooms;
+        _refreshTile = new ActionTileVm("Odśwież", "", () => _ = RefreshHueAsync());
+        _passportTile = new ActionTileVm("Paszport", "", () => _ = CreatePassportAsync());
+        _autostartTile = new ActionTileVm("Autostart", "", ToggleAutostart);
+        TilesControl.ItemsSource = new CompositeCollection
+        {
+            new CollectionContainer { Collection = _rooms },
+            new CollectionContainer { Collection = _settings.Current.Scripts },
+            new CollectionContainer { Collection = new[] { _refreshTile, _passportTile, _autostartTile } },
+        };
 
         _metricsTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _metricsTimer.Tick += (_, _) =>
@@ -121,7 +133,9 @@ public partial class MainWindow : Window
 
     private void ShowFlyout()
     {
-        AutostartToggle.IsChecked = StartupManager.IsEnabled();
+        _autostartTile.IsOn = StartupManager.IsEnabled();
+        ApplyAccentColor();
+        ShowHomePage();
 
         // Keep the first frame invisible and off screen until the layout is known, so nothing flashes.
         RootBorder.Opacity = 0;
@@ -158,6 +172,7 @@ public partial class MainWindow : Window
         }
 
         _metricsTimer.Stop();
+        ShowHomePage();
         _opening = false;
         BeginAnimation(TopProperty, null);
         RootBorder.BeginAnimation(OpacityProperty, null);
@@ -211,7 +226,16 @@ public partial class MainWindow : Window
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape)
+        if (e.Key != Key.Escape)
+        {
+            return;
+        }
+
+        if (ScenesPage.Visibility == Visibility.Visible)
+        {
+            ShowHomePage();
+        }
+        else
         {
             HideFlyout();
         }
@@ -273,9 +297,9 @@ public partial class MainWindow : Window
 
     // ---------- Footer ----------
 
-    private async void PassportButton_Click(object sender, RoutedEventArgs e)
+    private async Task CreatePassportAsync()
     {
-        PassportButton.IsEnabled = false;
+        _passportTile.IsEnabled = false;
         ShowFooterStatus("Generuję paszport komputera…");
 
         try
@@ -291,7 +315,7 @@ public partial class MainWindow : Window
         }
         finally
         {
-            PassportButton.IsEnabled = true;
+            _passportTile.IsEnabled = true;
         }
     }
 
@@ -311,9 +335,9 @@ public partial class MainWindow : Window
         }
     }
 
-    private void AutostartToggle_Click(object sender, RoutedEventArgs e)
+    private void ToggleAutostart()
     {
-        var wanted = AutostartToggle.IsChecked == true;
+        var wanted = !_autostartTile.IsOn;
 
         try
         {
@@ -326,7 +350,41 @@ public partial class MainWindow : Window
             ShowFooterStatus(ex.Message);
         }
 
-        AutostartToggle.IsChecked = StartupManager.IsEnabled();
+        _autostartTile.IsOn = StartupManager.IsEnabled();
+    }
+
+    private void ActionTile_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is ActionTileVm tile)
+        {
+            tile.Action();
+        }
+    }
+
+    // ---------- Pages and accent ----------
+
+    private void ShowHomePage()
+    {
+        ScenesPage.Visibility = Visibility.Collapsed;
+        HomePage.Visibility = Visibility.Visible;
+    }
+
+    private void ShowScenesPage(HueRoomVm room)
+    {
+        ScenesPage.DataContext = room;
+        HomePage.Visibility = Visibility.Collapsed;
+        ScenesPage.Visibility = Visibility.Visible;
+    }
+
+    private void ScenesBackButton_Click(object sender, RoutedEventArgs e) => ShowHomePage();
+
+    private static void ApplyAccentColor()
+    {
+        // The brush lives in App.xaml and is shared by every style, so changing its colour restyles the panel.
+        if (Application.Current.Resources["AccentBrush"] is SolidColorBrush { IsFrozen: false } brush)
+        {
+            brush.Color = AccentColor.Read();
+        }
     }
 
     private void ShowFooterStatus(string text)
