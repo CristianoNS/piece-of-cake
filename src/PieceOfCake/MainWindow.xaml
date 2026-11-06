@@ -94,6 +94,28 @@
                                 </DataTemplate.Triggers>
                             </DataTemplate>
 
+                            <DataTemplate DataType="{x:Type vm:AppGroupVm}">
+                                <StackPanel Margin="6,0" Height="96">
+                                    <Button Style="{StaticResource TileButton}" ToolTip="{Binding ToolTip}"
+                                            Click="AppGroup_Click">
+                                        <ItemsControl ItemsSource="{Binding Icons}" Focusable="False" Width="40">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Columns="2"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Image Source="{Binding}" Width="18" Height="18" Margin="1"
+                                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Button>
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource TileLabel}"/>
+                                </StackPanel>
+                            </DataTemplate>
+
                             <DataTemplate DataType="{x:Type svc:ScriptEntry}">
                                 <StackPanel Margin="6,0" Height="96">
                                     <Button Style="{StaticResource TileButton}" Content="&#xE756;"

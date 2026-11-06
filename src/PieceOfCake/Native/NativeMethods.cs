@@ -69,6 +69,34 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
 
+    public const uint SiigbfBiggerSizeOk = 0x0001;
+    public const uint SiigbfIconOnly = 0x0004;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ImageSize
+    {
+        public int Width;
+        public int Height;
+    }
+
+    /// <summary>Lets the shell hand out the icon or thumbnail of any shell item (file, shortcut, Store app).</summary>
+    [ComImport]
+    [Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IShellItemImageFactory
+    {
+        [PreserveSig]
+        public int GetImage(ImageSize size, uint flags, out IntPtr bitmap);
+    }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+    public static extern void SHCreateItemFromParsingName(
+        string path, IntPtr bindContext, ref Guid riid, out IShellItemImageFactory item);
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DeleteObject(IntPtr handle);
+
     public const uint SwpNoSize = 0x0001;
     public const uint SwpNoMove = 0x0002;
     public const uint SwpNoZOrder = 0x0004;

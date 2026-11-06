@@ -50,6 +50,11 @@ public sealed class SettingsStore
             var json = File.ReadAllText(FilePath, Encoding.UTF8);
             Current = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
             Current.Scripts ??= new List<ScriptEntry>();
+            Current.AppGroups ??= new List<AppGroupEntry>();
+            foreach (var group in Current.AppGroups)
+            {
+                group.Apps ??= new List<AppEntry>();
+            }
         }
         catch (JsonException ex)
         {
