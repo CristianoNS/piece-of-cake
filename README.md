@@ -10,8 +10,8 @@ procesora i pamięci oraz prędkość sieci, steruje światłami Philips Hue i u
 - **Statystyki systemu** w dolnym pasku: procesor, zajęta pamięć oraz prędkość pobierania i wysyłania.
 - **Światła Philips Hue:** pokoje i strefy jako kafelki. Kliknięcie ikony włącza lub gasi światło, strzałka obok
   otwiera listę scen, a suwak ustawia jasność.
-- **Skróty do programów:** kafelki z prawdziwymi ikonami (np. Chrome, Discord, Claude). Kliknięcie uruchamia
-  program i chowa panel.
+- **Grupy programów:** jeden kafelek z ikonami kilku programów (np. Chrome, Discord i Claude). Jedno kliknięcie
+  uruchamia wszystkie naraz i chowa panel.
 - **Własne skrypty:** każdy wpisany przez Ciebie skrypt jest kafelkiem w panelu.
 - **Paszport komputera:** zapisuje opis sprzętu i systemu w pliku Markdown.
 - **Autostart:** przełącznik uruchamiania razem z Windows.
