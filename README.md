@@ -74,24 +74,33 @@ Adres IP mostka znajdziesz w aplikacji Hue: Ustawienia → Mostki Hue → (i).
 - Klucz dostępu jest zapisany zaszyfrowany (DPAPI, tylko dla Twojego konta Windows).
 - Certyfikat mostka jest zapamiętany przy pierwszym połączeniu. Jeśli się zmieni, panel poprosi o ponowne parowanie.
 
-## Skróty do programów
+## Grupy programów
 
 Plik ustawień: `%APPDATA%\PieceOfCake\settings.json` (przycisk z zębatką w panelu otwiera ten folder).
-Dodaj wpisy do listy `Apps`, np.:
+Dodaj wpisy do listy `AppGroups`. Każda grupa to jeden kafelek, który jednym kliknięciem uruchamia wszystkie jej
+programy, np.:
 
 ```json
-"Apps": [
-  { "Name": "Chrome", "Target": "shell:AppsFolder\\Chrome" },
-  { "Name": "Discord", "Target": "shell:AppsFolder\\com.squirrel.Discord.Discord" },
-  { "Name": "Claude", "Target": "shell:AppsFolder\\Claude_pzs8sxrjxfjjc!Claude" }
+"AppGroups": [
+  {
+    "Name": "Aplikacje",
+    "Apps": [
+      { "Name": "Chrome", "Target": "shell:AppsFolder\\Chrome" },
+      { "Name": "Discord", "Target": "shell:AppsFolder\\com.squirrel.Discord.Discord" },
+      { "Name": "Claude", "Target": "shell:AppsFolder\\Claude_pzs8sxrjxfjjc!Claude" }
+    ]
+  }
 ]
 ```
 
+Na kafelku widać ikony do czterech pierwszych programów grupy (jak w folderze), a podpowiedź po najechaniu
+wymienia je wszystkie. Możesz mieć kilka grup, np. „Praca" i „Gry".
+
 `Target` to identyfikator programu z menu Start w postaci `shell:AppsFolder\<AppId>` (działa także dla aplikacji
 ze Sklepu), ścieżka do pliku lub folderu albo adres internetowy. Identyfikatory zainstalowanych programów wypiszesz
-w PowerShellu poleceniem `Get-StartApps`. Ikony pobiera system, więc kafelki wyglądają tak samo jak w menu Start.
-Zmiany w pliku są widoczne po ponownym uruchomieniu aplikacji.
-
+w PowerShellu poleceniem `Get-StartApps`. Ikony pobiera system, więc wyglądają tak samo jak w menu Start. Jeśli
+któryś program się nie uruchomi, reszta i tak wystartuje, a panel pokaże, którego nie udało się otworzyć. Zmiany
+w pliku są widoczne po ponownym uruchomieniu aplikacji.
 ## Własne skrypty
 
 Plik ustawień: `%APPDATA%\PieceOfCake\settings.json` (przycisk z zębatką w panelu otwiera ten folder).

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -57,7 +58,7 @@ public partial class MainWindow : Window
         TilesControl.ItemsSource = new CompositeCollection
         {
             new CollectionContainer { Collection = _rooms },
-            new CollectionContainer { Collection = _settings.Current.Apps.Select(a => new AppTileVm(a)).ToList() },
+            new CollectionContainer { Collection = _settings.Current.AppGroups.Select(g => new AppGroupVm(g)).ToList() },
             new CollectionContainer { Collection = _settings.Current.Scripts },
             new CollectionContainer { Collection = new[] { _refreshTile, _passportTile, _autostartTile } },
         };
@@ -344,22 +345,35 @@ public partial class MainWindow : Window
 
     // ---------- Apps ----------
 
-    private void AppTile_Click(object sender, RoutedEventArgs e)
+    private void AppGroup_Click(object sender, RoutedEventArgs e)
     {
-        if ((sender as FrameworkElement)?.DataContext is not AppTileVm app)
+        if ((sender as FrameworkElement)?.DataContext is not AppGroupVm group)
         {
             return;
         }
 
-        try
+        // Start every program of the group; one that fails must not stop the others.
+        var failed = new List<string>();
+        foreach (var app in group.Apps)
         {
-            Process.Start(new ProcessStartInfo(app.Target) { UseShellExecute = true });
+            try
+            {
+                Process.Start(new ProcessStartInfo(app.Target) { UseShellExecute = true });
+            }
+            catch (Exception ex) when (ex is Win32Exception or InvalidOperationException or IOException)
+            {
+                Logger.Log(ex);
+                failed.Add(app.Name);
+            }
+        }
+
+        if (failed.Count == 0)
+        {
             HideFlyout();
         }
-        catch (Exception ex) when (ex is Win32Exception or InvalidOperationException or IOException)
+        else
         {
-            Logger.Log(ex);
-            ShowFooterStatus($"Nie udało się uruchomić „{app.Name}”: {ex.Message}");
+            ShowFooterStatus("Nie udało się uruchomić: " + string.Join(", ", failed));
         }
     }
 
