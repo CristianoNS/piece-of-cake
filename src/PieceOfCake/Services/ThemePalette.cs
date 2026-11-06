@@ -32,6 +32,14 @@ internal static class ThemePalette
         Set(resources, "DividerBrush", light ? Color.FromArgb(0x10, 0, 0, 0) : Color.FromArgb(0x15, 0xFF, 0xFF, 0xFF));
         Set(resources, "FooterBrush", FooterColor(light, acrylic));
 
+        // Standard controls (buttons, text box, list rows, switch), after the WinUI fill and stroke values.
+        Set(resources, "StrongStrokeBrush", light ? Color.FromArgb(0x72, 0, 0, 0) : Color.FromArgb(0x9A, 0xFF, 0xFF, 0xFF));
+        Set(resources, "ButtonFillBrush", light ? Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x0F, 0xFF, 0xFF, 0xFF));
+        Set(resources, "ButtonBorderBrush", light ? Color.FromArgb(0x0F, 0, 0, 0) : Color.FromArgb(0x12, 0xFF, 0xFF, 0xFF));
+        Set(resources, "InputFillBrush", light ? Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x0F, 0xFF, 0xFF, 0xFF));
+        Set(resources, "InputFocusFillBrush", light ? Color.FromRgb(0xFF, 0xFF, 0xFF) : Color.FromArgb(0xB3, 0x1E, 0x1E, 0x1E));
+        Set(resources, "SelectedRowBrush", light ? Color.FromArgb(0x0A, 0, 0, 0) : Color.FromArgb(0x0F, 0xFF, 0xFF, 0xFF));
+
         Set(resources, "SliderTrackBrush", light ? Color.FromArgb(0x72, 0, 0, 0) : Color.FromArgb(0x8D, 0xFF, 0xFF, 0xFF));
         Set(resources, "SliderThumbRingBrush", light ? Color.FromRgb(0xFF, 0xFF, 0xFF) : Color.FromRgb(0x45, 0x45, 0x45));
     }

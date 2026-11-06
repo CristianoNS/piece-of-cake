@@ -111,6 +111,7 @@ public partial class MainWindow
             for (var i = 0; i < rooms.Count; i++)
             {
                 _rooms[i].SetState(rooms[i].IsOn, rooms[i].Brightness);
+                _rooms[i].SetActiveScenes(rooms[i].Scenes);
             }
 
             UpdateSelectedRoom();
@@ -126,7 +127,7 @@ public partial class MainWindow
                 info.GroupedLightId,
                 info.IsOn,
                 info.Brightness,
-                info.Scenes.Select(s => new HueSceneVm(s.Id, s.Name)).ToList());
+                info.Scenes.Select(s => new HueSceneVm(s.Id, s.Name, s.IsActive)).ToList());
             room.PowerChanged += OnRoomPowerChanged;
             room.BrightnessCommitted += OnRoomBrightnessCommitted;
             _rooms.Add(room);
@@ -218,6 +219,7 @@ public partial class MainWindow
         try
         {
             await hue.RecallSceneAsync(scene.Id);
+            (ScenesPage.DataContext as HueRoomVm)?.MarkActiveScene(scene.Id);
             await Task.Delay(600);
             await RefreshHueAsync();
         }

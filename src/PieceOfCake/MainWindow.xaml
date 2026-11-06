@@ -32,8 +32,10 @@
                 <StackPanel Margin="24,24,24,0">
 
                     <StackPanel x:Name="HuePairPanel" Visibility="Collapsed" Margin="0,0,0,16">
-                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource SubTextBrush}" Margin="0,0,0,8"
-                                   Text="Podaj adres IP mostka Hue, kliknij „Połącz” i w ciągu 30 sekund naciśnij okrągły przycisk na mostku."/>
+                        <TextBlock Text="Połącz z mostkiem Hue" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource SubTextBrush}"
+                                   Margin="0,4,0,12"
+                                   Text="Wpisz adres IP mostka, kliknij „Połącz” i w ciągu 30 sekund naciśnij okrągły przycisk na mostku."/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -41,12 +43,12 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBox x:Name="BridgeIpBox" Style="{StaticResource DarkTextBox}" VerticalAlignment="Center"/>
-                            <Button x:Name="DetectBridgeButton" Grid.Column="1" Style="{StaticResource ChipButton}"
-                                    Content="Wykryj" Margin="6,0,0,0"
+                            <Button x:Name="DetectBridgeButton" Grid.Column="1" Style="{StaticResource StandardButton}"
+                                    Content="Wykryj" Margin="8,0,0,0"
                                     ToolTip="Szuka mostka przez usługę discovery.meethue.com (Philips)"
                                     Click="DetectBridgeButton_Click"/>
-                            <Button x:Name="PairButton" Grid.Column="2" Style="{StaticResource ChipButton}"
-                                    Content="Połącz" Margin="6,0,0,0" Click="PairButton_Click"/>
+                            <Button x:Name="PairButton" Grid.Column="2" Style="{StaticResource AccentButton}"
+                                    Content="Połącz" Margin="8,0,0,0" Click="PairButton_Click"/>
                         </Grid>
                     </StackPanel>
                     <TextBlock x:Name="HueStatusText" Visibility="Collapsed" TextWrapping="Wrap"
@@ -143,7 +145,7 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <!-- Ekran scen wybranego pokoju -->
+            <!-- Ekran scen wybranego pokoju (układ jak lista sieci Wi-Fi w panelu Windows) -->
             <Grid x:Name="ScenesPage" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -151,32 +153,25 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid Margin="16,16,24,8">
+                <Grid Height="48">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="9"/>
+                        <ColumnDefinition Width="32"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="ScenesBackButton" Style="{StaticResource IconButton}" Content="&#xE72B;"
-                            ToolTip="Wróć" Click="ScenesBackButton_Click"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
-                               VerticalAlignment="Center" Margin="8,0" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{DynamicResource SubTextBrush}"
-                               Text="Wyłączone">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsOn}" Value="True">
-                                        <Setter Property="Text" Value="Włączone"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <Button x:Name="ScenesBackButton" Grid.Column="1" Style="{StaticResource IconButton}"
+                            Content="&#xE72B;" Width="32" Height="32" FontSize="14" ToolTip="Wróć"
+                            Click="ScenesBackButton_Click"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
+                               VerticalAlignment="Center" Margin="9,0" TextTrimming="CharacterEllipsis"/>
+                    <ToggleButton Grid.Column="3" Style="{StaticResource SwitchToggle}" Margin="0,0,16,0"
+                                  VerticalAlignment="Center" IsChecked="{Binding IsOn, Mode=TwoWay}"
+                                  ToolTip="Włącz lub wyłącz pokój"/>
                 </Grid>
 
-                <ScrollViewer Grid.Row="1" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding Scenes}" Margin="16,0" Focusable="False">
+                <ScrollViewer Grid.Row="1" VerticalAlignment="Top" MaxHeight="224" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Scenes}" Focusable="False">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource SceneRow}" Content="{Binding Name}"
@@ -186,17 +181,20 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <Grid Grid.Row="2" Height="32" Margin="24,12,24,22">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="33"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="36"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="&#xE706;" FontFamily="{StaticResource IconFont}" FontSize="14"
-                               VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1" Style="{StaticResource FlatSlider}" Minimum="1" Maximum="100"
-                            Value="{Binding Brightness, Mode=TwoWay}"/>
-                </Grid>
+                <StackPanel Grid.Row="2">
+                    <Rectangle Height="1" Fill="{DynamicResource DividerBrush}"/>
+                    <Grid Height="32" Margin="24,22,24,18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="33"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="36"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="&#xE706;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                   VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1" Style="{StaticResource FlatSlider}" Minimum="1" Maximum="100"
+                                Value="{Binding Brightness, Mode=TwoWay}"/>
+                    </Grid>
+                </StackPanel>
             </Grid>
 
             <!-- Pasek dolny: statystyki systemu i ustawienia -->
