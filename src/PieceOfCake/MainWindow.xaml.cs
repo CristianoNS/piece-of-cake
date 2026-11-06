@@ -3,13 +3,14 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
+
 using System.Windows.Threading;
 using PieceOfCake.Native;
 using PieceOfCake.Services;
@@ -20,26 +21,32 @@ namespace PieceOfCake;
 public partial class MainWindow : Window
 {
     private const double ScreenMargin = 12;
-    private const double SlideDistance = 40;
-    private static readonly Duration OpenDuration = new(TimeSpan.FromMilliseconds(230));
+
+
 
     private readonly SettingsStore _settings;
     private readonly CpuMeter _cpu = new();
     private readonly NetworkMeter _network = new();
     private readonly DispatcherTimer _metricsTimer;
     private readonly DispatcherTimer _statusTimer;
+    private readonly FlyoutSlide _slide;
 
     private readonly ActionTileVm _refreshTile;
     private readonly ActionTileVm _passportTile;
     private readonly ActionTileVm _autostartTile;
 
+    private SystemTheme _theme = new(false, true);
+    private bool _backdropSupported;
+    private bool _appliedTransparency = true;
+    private bool _settingsChanged;
     private DateTime _lastHiddenUtc = DateTime.MinValue;
-    private bool _opening;
+    private bool _closing;
 
     public MainWindow(SettingsStore settings)
     {
         _settings = settings;
         InitializeComponent();
+        _slide = new FlyoutSlide(this);
 
         MaxHeight = Math.Max(300, SystemParameters.WorkArea.Height - 2 * ScreenMargin);
 
@@ -69,17 +76,35 @@ public partial class MainWindow : Window
 
         SizeChanged += (_, _) =>
         {
-            if (IsVisible && !_opening)
+            if (IsVisible && !_slide.IsRunning)
             {
                 PositionWindow();
             }
         };
 
+        SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
         Closed += (_, _) =>
         {
+            SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
             _pairCts?.Cancel();
             _hue?.Dispose();
         };
+    }
+
+    /// <summary>
+    /// True when the Windows appearance settings changed after this window last looked at them. DWM keeps the old
+    /// backdrop state of an existing window (flat grey after transparency is switched back on), so the owner
+    /// should create a new window instead of reusing this one.
+    /// </summary>
+    public bool NeedsRecreate => _settingsChanged || SystemTheme.Read().TransparencyEnabled != _appliedTransparency;
+
+    private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+    {
+        if (e.Category is UserPreferenceCategory.General or UserPreferenceCategory.Color
+            or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.Window)
+        {
+            _settingsChanged = true;
+        }
     }
 
     /// <summary>Shows the flyout above the taskbar, or hides it when it is already visible.</summary>
@@ -110,43 +135,100 @@ public partial class MainWindow : Window
         Left = -32000;
         Show();
         UpdateLayout();
+
+        // Let WPF draw the content once while it is off screen; the first render is expensive and would otherwise
+        // stall the opening slide of the first real opening.
+        Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
         Hide();
         ShowActivated = true;
+
+        // Load the rooms now, so the first opening already has its final height instead of growing later.
+        _ = RefreshAllAsync();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
 
-        if (WindowEffects.ApplyFlyoutLook(this))
+        _backdropSupported = WindowEffects.ApplyFlyoutLook(this);
+        ApplyTheme(SystemTheme.Read());
+    }
+
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        // The acrylic backdrop only renders for an active window; set it again once activation has happened.
+        if (IsVisible)
         {
-            Background = Brushes.Transparent;
-            RootBorder.Background = new SolidColorBrush(Color.FromArgb(0xB8, 0x20, 0x20, 0x20));
+            WindowEffects.RefreshBackdrop(this, !_theme.IsLight, UsesAcrylic);
         }
     }
 
     protected override void OnDeactivated(EventArgs e)
     {
         base.OnDeactivated(e);
-        HideFlyout();
+
+        // Hiding inside the deactivation notification leaves the DWM acrylic backdrop in a broken state (the next
+        // opening is flat grey), so let the notification finish first.
+        _ = Dispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
+        {
+            if (!IsActive)
+            {
+                HideFlyout();
+            }
+        });
     }
 
     private void ShowFlyout()
     {
         _autostartTile.IsOn = StartupManager.IsEnabled();
-        ApplyAccentColor();
+        ApplyTheme(SystemTheme.Read());
         ShowHomePage();
 
-        // Keep the first frame invisible and off screen until the layout is known, so nothing flashes.
-        RootBorder.Opacity = 0;
+        // Keep the first frame off screen until the layout is known, so nothing flashes.
         Left = -32000;
         Show();
+        WindowEffects.RefreshBackdrop(this, !_theme.IsLight, UsesAcrylic);
         UpdateLayout();
-        PositionWindow();
-        PlayOpenAnimation();
+
+        var animate = FlyoutSlide.Enabled;
+        if (animate)
+        {
+            // Start below the taskbar edge; the slide brings the panel up to its resting place.
+            var area = SystemParameters.WorkArea;
+            _slide.PrepareOpen(area.Right - ActualWidth - ScreenMargin, area.Bottom - ActualHeight - ScreenMargin);
+        }
+        else
+        {
+            PositionWindow();
+        }
+
         Activate();
 
-        // Slow work waits until the first frame is on screen.
+        UpdateMetrics();
+
+        if (animate)
+        {
+            // Activating raises the window above the taskbar; put it back under it before the first frame.
+            _slide.KeepBehindTaskbar();
+
+            // Network and bridge work would stall the UI thread (and the slide) if it started now.
+            _slide.Open(() =>
+            {
+                PositionWindow();
+                StartBackgroundWork();
+            });
+        }
+        else
+        {
+            StartBackgroundWork();
+        }
+    }
+
+    /// <summary>Slow work (adapter list, bridge refresh) that must not compete with the opening slide.</summary>
+    private void StartBackgroundWork()
+    {
         _ = Dispatcher.BeginInvoke(DispatcherPriority.Background, StartMetrics);
         _ = RefreshAllAsync();
     }
@@ -161,47 +243,42 @@ public partial class MainWindow : Window
         // The adapter list is read once per opening; the timer then only reads two counters per adapter.
         _network.Refresh();
         NetText.Text = "–";
+        NetUpText.Text = "–";
+        NetUpIcon.Visibility = Visibility.Visible;
         _metricsTimer.Start();
     }
 
     private void HideFlyout()
     {
-        if (!IsVisible)
+        if (!IsVisible || _closing)
         {
             return;
         }
 
         _metricsTimer.Stop();
+
+        if (FlyoutSlide.Enabled)
+        {
+            // Slide back under the taskbar, like the system flyouts; the window is hidden when it is gone.
+            _closing = true;
+            _slide.Close(FinishHide);
+        }
+        else
+        {
+            _slide.Cancel();
+            FinishHide();
+        }
+    }
+
+    private void FinishHide()
+    {
+        _closing = false;
         ShowHomePage();
-        _opening = false;
-        BeginAnimation(TopProperty, null);
-        RootBorder.BeginAnimation(OpacityProperty, null);
         Hide();
         _lastHiddenUtc = DateTime.UtcNow;
 
         // Give memory back once the panel is hidden; low priority so the hide itself is not delayed.
         _ = Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, MemoryTrimmer.Trim);
-    }
-
-    /// <summary>Slides the panel up a few pixels while it fades in, like the system flyouts.</summary>
-    private void PlayOpenAnimation()
-    {
-        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
-        var target = Top;
-        _opening = true;
-        Top = target + SlideDistance;
-
-        var slide = new DoubleAnimation(target + SlideDistance, target, OpenDuration) { EasingFunction = easing };
-        slide.Completed += (_, _) =>
-        {
-            // Drop the animation and settle on the real position (the height may have changed meanwhile).
-            _opening = false;
-            BeginAnimation(TopProperty, null);
-            PositionWindow();
-        };
-
-        RootBorder.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, OpenDuration) { EasingFunction = easing });
-        BeginAnimation(TopProperty, slide);
     }
 
     private void PositionWindow()
@@ -245,9 +322,10 @@ public partial class MainWindow : Window
 
     private void UpdateNetwork()
     {
-        NetText.Text = _network.TrySample(out var download, out var upload)
-            ? $"↓ {NetworkMeter.FormatSpeed(download)}   ↑ {NetworkMeter.FormatSpeed(upload)}"
-            : "brak połączenia";
+        var connected = _network.TrySample(out var download, out var upload);
+        NetText.Text = connected ? NetworkMeter.FormatSpeed(download) : "brak połączenia";
+        NetUpText.Text = connected ? NetworkMeter.FormatSpeed(upload) : "";
+        NetUpIcon.Visibility = connected ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void UpdateMetrics()
@@ -378,12 +456,28 @@ public partial class MainWindow : Window
 
     private void ScenesBackButton_Click(object sender, RoutedEventArgs e) => ShowHomePage();
 
-    private static void ApplyAccentColor()
+    private bool UsesAcrylic => _backdropSupported && _theme.TransparencyEnabled;
+
+    /// <summary>
+    /// Follows the Windows settings (read only): light or dark system mode, transparency effects on or off and the
+    /// accent colour. With transparency off the panel is solid, like the system flyouts.
+    /// </summary>
+    private void ApplyTheme(SystemTheme theme)
     {
-        // The brush lives in App.xaml and is shared by every style, so changing its colour restyles the panel.
-        if (Application.Current.Resources["AccentBrush"] is SolidColorBrush { IsFrozen: false } brush)
+        _theme = theme;
+        _appliedTransparency = theme.TransparencyEnabled;
+        ThemePalette.Apply(Application.Current.Resources, theme.IsLight, AccentColor.Read(theme.IsLight), UsesAcrylic);
+
+        if (UsesAcrylic)
         {
-            brush.Color = AccentColor.Read();
+            Background = Brushes.Transparent;
+            RootBorder.Background = new SolidColorBrush(ThemePalette.AcrylicTint(theme.IsLight));
+        }
+        else
+        {
+            var solid = new SolidColorBrush(ThemePalette.SolidBackground(theme.IsLight));
+            Background = solid;
+            RootBorder.Background = solid;
         }
     }
 

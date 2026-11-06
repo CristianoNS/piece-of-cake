@@ -1,3 +1,4 @@
+using System;
 using PieceOfCake.Services;
 using Xunit;
 
@@ -12,7 +13,7 @@ public sealed class SettingsStoreTests
 
         store.SetAppKey("secret-key");
 
-        Assert.NotEqual("secret-key", store.Current.ProtectedAppKey);
+        Assert.NotEqual("secret-key", store.Current.ProtectedAppKey, StringComparer.Ordinal);
         Assert.Equal("secret-key", store.GetAppKey());
     }
 

@@ -9,6 +9,7 @@ internal static class NativeMethods
     public const int DwmwaWindowCornerPreference = 33;
     public const int DwmwaSystemBackdropType = 38;
     public const int DwmwcpRound = 2;
+    public const int DwmsbtNone = 1;
     public const int DwmsbtTransientWindow = 3;
 
     public const int GwlExStyle = -20;
@@ -60,6 +61,28 @@ internal static class NativeMethods
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool DestroyIcon(IntPtr handle);
+
+    [DllImport("user32.dll", EntryPoint = "SendMessageW")]
+    public static extern IntPtr SendMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
+
+    public const uint SwpNoSize = 0x0001;
+    public const uint SwpNoMove = 0x0002;
+    public const uint SwpNoZOrder = 0x0004;
+    public const uint SwpNoActivate = 0x0010;
+    public const uint SwpAsyncWindowPos = 0x4000;
+
+    [DllImport("dwmapi.dll")]
+    public static extern int DwmFlush();
+
+    [DllImport("user32.dll", EntryPoint = "FindWindowW", CharSet = CharSet.Unicode)]
+    public static extern IntPtr FindWindow(string className, string? windowName);
+
+    public const uint WmNcActivate = 0x0086;
+    public const uint SwpFrameChangedFlags = 0x0001 | 0x0002 | 0x0004 | 0x0010 | 0x0020; // NOSIZE|NOMOVE|NOZORDER|NOACTIVATE|FRAMECHANGED
 
     [DllImport("kernel32.dll")]
     public static extern IntPtr GetCurrentProcess();
