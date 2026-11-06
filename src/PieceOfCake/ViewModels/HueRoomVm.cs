@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
+using PieceOfCake.Services;
 
 namespace PieceOfCake.ViewModels;
 
@@ -89,6 +91,25 @@ public sealed class HueRoomVm : INotifyPropertyChanged
                 _debounce.Stop();
                 _debounce.Start();
             }
+        }
+    }
+
+    /// <summary>Marks the scenes the bridge reports as applied.</summary>
+    public void SetActiveScenes(IReadOnlyList<HueSceneInfo> infos)
+    {
+        foreach (var scene in Scenes)
+        {
+            var info = infos.FirstOrDefault(i => string.Equals(i.Id, scene.Id, StringComparison.Ordinal));
+            scene.IsActive = info?.IsActive ?? false;
+        }
+    }
+
+    /// <summary>Marks one scene as applied right after the user picks it, before the bridge confirms.</summary>
+    public void MarkActiveScene(string sceneId)
+    {
+        foreach (var scene in Scenes)
+        {
+            scene.IsActive = string.Equals(scene.Id, sceneId, StringComparison.Ordinal);
         }
     }
 

@@ -191,7 +191,12 @@ public sealed class HueClient : IDisposable
                 scenesByGroup[groupId] = list;
             }
 
-            list.Add(new HueSceneInfo(id, name));
+            // status.active is "inactive", "static" or "dynamic_palette"; anything but inactive means it is applied.
+            var activeState = GetString(scene, "status", "active");
+            var isActive = !string.IsNullOrEmpty(activeState)
+                           && !string.Equals(activeState, "inactive", StringComparison.Ordinal);
+
+            list.Add(new HueSceneInfo(id, name, isActive));
         }
 
         var stateByLight = new Dictionary<string, (bool On, double Brightness)>(StringComparer.Ordinal);
